@@ -1073,12 +1073,15 @@ Return Ravenfall
 * [x] Core Gameplay Loop
 * [x] Technical Stack
 
+## In Progress / Done
+
+* [x] Godot Project (Godot 4.7.2, PHASE 0 complete — see docs/roadmap.md)
+* [x] 3D Scenes (test world)
+* [x] Isometric Camera
+
 ## Not Started
 
-* [ ] Godot Project
-* [ ] Code Architecture
-* [ ] 3D Scenes
-* [ ] Isometric Camera
+* [ ] Code Architecture (managers beyond GameManager)
 * [ ] Combat Implementation
 * [ ] UI
 * [ ] Data System
