@@ -33,8 +33,9 @@ func goto_blackwood() -> void:
 	get_tree().change_scene_to_file(SCENE_BLACKWOOD)
 
 
-func start_combat(enemy: EnemyData) -> void:
+func start_combat(enemy: EnemyData, node_id: String = "") -> void:
 	current_enemy = enemy
+	MapManager.current_node_id = node_id
 	get_tree().change_scene_to_file(SCENE_COMBAT)
 
 

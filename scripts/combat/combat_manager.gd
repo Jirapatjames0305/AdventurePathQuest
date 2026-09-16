@@ -37,7 +37,7 @@ func _ready() -> void:
 	player_hp_bar.max_value = _player.max_hp
 	enemy_hp_bar.max_value = _enemy.max_hp
 	return_button.visible = false
-	return_button.pressed.connect(GameManager.goto_ravenfall)
+	return_button.pressed.connect(GameManager.goto_blackwood)
 	_refresh()
 
 	_run_battle()
@@ -112,18 +112,20 @@ func _enemy_attack() -> void:
 
 func _on_victory() -> void:
 	var reward := GameManager.apply_victory_rewards(_enemy)
+	MapManager.complete_current()
 	_log("\n[b][color=gold]🏆 VICTORY![/color][/b]")
 	_log("✨ Reward: [color=orange]+%d Power[/color], [color=yellow]+%d Gold[/color]" % [
 		reward.power, reward.gold
 	])
 	_refresh()
-	return_button.text = "🏰 Return to Ravenfall"
+	return_button.text = "🌲 Back to the map"
 
 
 func _on_defeat() -> void:
 	# Prototype defeat rule: you barely escape with 1 HP. Rest in town to recover.
 	_player.hp = 1
+	MapManager.current_node_id = ""
 	_log("\n[b][color=red]☠️ DEFEAT...[/color][/b]")
-	_log("You barely escape back to Ravenfall with 1 HP. Rest to recover!")
+	_log("You barely escape with 1 HP. Return to Ravenfall and rest!")
 	_refresh()
-	return_button.text = "🏰 Limp back to Ravenfall"
+	return_button.text = "🌲 Back to the map"
