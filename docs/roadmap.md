@@ -17,6 +17,21 @@ Full roadmap: [Readme.md](../Readme.md)
 - [x] Orthographic isometric camera (pitch −30°, yaw 45°)
 - [x] Camera follow + player test movement
 
-## Phase 1 — Core Gameplay Prototype ⬅ NEXT
+## Phase 1 — Core Gameplay Prototype ✅ Sprint 01 (2026-09-16)
 
 Ravenfall → Blackwood → Enemy Selection → Auto Combat → Reward → Ravenfall
+
+- [x] EnemyData resource (`scripts/enemies/enemy_data.gd`)
+- [x] 3 enemies as `.tres` data: Forest Wolf, Wild Boar, Alpha Wolf (`data/enemies/`)
+- [x] Auto combat per README rules — speed order, immediate death, no counterattack (`scripts/combat/combat_manager.gd`)
+- [x] Damage formula: Power × 10% per hit (min 1) — tune `DAMAGE_FACTOR`
+- [x] Reward: +50% enemy Power, +gold
+- [x] Defeat rule (prototype): escape with 1 HP
+- [x] Ravenfall UI overlay on 3D world — stats, Rest (full heal), Enter Blackwood
+- [x] Blackwood enemy-selection scene
+- [x] Combat scene with HP bars + battle log
+- [x] Headless test `tests/loop_test.tscn` — full battle vs Wolf verifies Power/Gold/HP
+
+## Phase 2 — Progression ⬅ NEXT
+
+EXP, Level Up, stat growth, shop/blacksmith, equipment, gold economy

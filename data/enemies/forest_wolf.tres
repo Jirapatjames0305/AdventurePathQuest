@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Forest Wolf"
+emoji = "🐺"
+power = 30
+max_hp = 40
+speed = 35
+gold_reward = 8
+description = "A hungry wolf prowling the edge of Blackwood."

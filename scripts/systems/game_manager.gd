@@ -1,8 +1,16 @@
 extends Node
 ## GameManager — autoload singleton
-## Holds global game state for THE FRONTIER prototype.
+## Holds global game state and drives the core loop:
+## Ravenfall -> Blackwood -> Enemy Selection -> Auto Combat -> Reward -> Ravenfall
+
+const SCENE_RAVENFALL := "res://scenes/main.tscn"
+const SCENE_BLACKWOOD := "res://scenes/world/forest/blackwood.tscn"
+const SCENE_COMBAT := "res://scenes/combat/combat.tscn"
 
 var player_data: PlayerData
+
+## Enemy chosen in Blackwood, consumed by the combat scene.
+var current_enemy: EnemyData
 
 
 func _ready() -> void:
@@ -15,3 +23,31 @@ func _ready() -> void:
 		player_data.speed,
 		player_data.gold,
 	])
+
+
+func goto_ravenfall() -> void:
+	get_tree().change_scene_to_file(SCENE_RAVENFALL)
+
+
+func goto_blackwood() -> void:
+	get_tree().change_scene_to_file(SCENE_BLACKWOOD)
+
+
+func start_combat(enemy: EnemyData) -> void:
+	current_enemy = enemy
+	get_tree().change_scene_to_file(SCENE_COMBAT)
+
+
+## README rule: Power reward = Enemy Power × 50%, plus gold.
+func apply_victory_rewards(enemy: EnemyData) -> Dictionary:
+	var reward := {
+		"power": enemy.power_reward(),
+		"gold": enemy.gold_reward,
+	}
+	player_data.power += reward.power
+	player_data.gold += reward.gold
+	return reward
+
+
+func rest() -> void:
+	player_data.heal(player_data.max_hp)

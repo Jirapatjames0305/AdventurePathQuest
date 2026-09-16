@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://3w20u2hei300" path="res://scripts/player/player.gd" id="1_player"]
 [ext_resource type="Script" uid="uid://cn3q60t01bw0u" path="res://scripts/world/camera_rig.gd" id="2_camrig"]
+[ext_resource type="Script" path="res://scripts/ui/ravenfall_ui.gd" id="3_ui"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.4, 0.6, 0.85, 1)
@@ -104,3 +105,66 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 25)
 projection = 1
 size = 14.0
 far = 120.0
+
+[node name="RavenfallUI" type="CanvasLayer" parent="."]
+script = ExtResource("3_ui")
+
+[node name="StatsPanel" type="PanelContainer" parent="RavenfallUI"]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 280.0
+offset_bottom = 200.0
+
+[node name="StatsMargin" type="MarginContainer" parent="RavenfallUI/StatsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="StatsLabel" type="Label" parent="RavenfallUI/StatsPanel/StatsMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "stats"
+
+[node name="TownTitle" type="Label" parent="RavenfallUI"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 24.0
+offset_right = 200.0
+offset_bottom = 80.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 40
+text = "🏰 Ravenfall"
+horizontal_alignment = 1
+
+[node name="ActionBar" type="HBoxContainer" parent="RavenfallUI"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -320.0
+offset_top = -104.0
+offset_right = 320.0
+offset_bottom = -32.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 24
+
+[node name="RestButton" type="Button" parent="RavenfallUI/ActionBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "🛏️ Rest (Full Heal)"
+
+[node name="ForestButton" type="Button" parent="RavenfallUI/ActionBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "🌲 Enter Blackwood"
