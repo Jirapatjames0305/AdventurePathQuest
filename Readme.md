@@ -920,16 +920,16 @@ Would eventually require:
 
 ## Combat
 
-* [ ] Select enemy
-* [ ] Speed determines attack order
-* [ ] Damage works
-* [ ] HP works
-* [ ] HP = 0 means loss
-* [ ] Dead unit cannot attack
-* [ ] Win condition works
-* [ ] Lose condition works
-* [ ] Rewards work
-* [ ] UI updates correctly
+* [x] Select enemy
+* [x] Speed determines attack order
+* [x] Damage works
+* [x] HP works
+* [x] HP = 0 means loss
+* [x] Dead unit cannot attack
+* [x] Win condition works
+* [x] Lose condition works
+* [x] Rewards work
+* [x] UI updates correctly
 
 ## Inventory
 
@@ -948,25 +948,25 @@ Would eventually require:
 
 ## Map
 
-* [ ] Select node
-* [ ] Unlock node
-* [ ] Travel
-* [ ] Event
-* [ ] Reward
-* [ ] Return
-* [ ] Save progress
+* [x] Select node
+* [x] Unlock node
+* [x] Travel
+* [x] Event (treasure node)
+* [x] Reward
+* [x] Return
+* [ ] Save progress (Phase 6)
 
 ## Isometric World
 
-* [ ] Orthographic camera
-* [ ] Correct camera angle
-* [ ] Player movement
-* [ ] Depth sorting
-* [ ] Collision
-* [ ] Lighting
-* [ ] Shadows
-* [ ] Environment props
-* [ ] Camera follow
+* [x] Orthographic camera
+* [x] Correct camera angle
+* [x] Player movement
+* [x] Depth sorting
+* [x] Collision
+* [x] Lighting
+* [x] Shadows
+* [x] Environment props (test crates)
+* [x] Camera follow
 
 ---
 
@@ -990,41 +990,41 @@ Reward
 Ravenfall
 ```
 
-## Tasks
+## Tasks — ✅ COMPLETE (2026-09-16)
 
 ### Project
 
-* [ ] Create Godot project
-* [ ] Setup Git
-* [ ] Create folders
-* [ ] Create Main Scene
+* [x] Create Godot project
+* [x] Setup Git
+* [x] Create folders
+* [x] Create Main Scene
 
 ### World
 
-* [ ] Create 3D test environment
-* [ ] Create Orthographic Camera
-* [ ] Setup Isometric angle
-* [ ] Create Ravenfall test scene
-* [ ] Create Blackwood test scene
+* [x] Create 3D test environment
+* [x] Create Orthographic Camera
+* [x] Setup Isometric angle
+* [x] Create Ravenfall test scene
+* [x] Create Blackwood test scene
 
 ### Systems
 
-* [ ] GameManager
-* [ ] PlayerData
-* [ ] EnemyData
-* [ ] MapManager
-* [ ] CombatManager
-* [ ] Reward System
+* [x] GameManager
+* [x] PlayerData
+* [x] EnemyData
+* [x] MapManager
+* [x] CombatManager
+* [x] Reward System
 
 ### Combat
 
-* [ ] Enemy selection
-* [ ] Speed system
-* [ ] Damage system
-* [ ] HP system
-* [ ] Win
-* [ ] Lose
-* [ ] Reward
+* [x] Enemy selection
+* [x] Speed system
+* [x] Damage system
+* [x] HP system
+* [x] Win
+* [x] Lose
+* [x] Reward
 
 ### Result
 
@@ -1073,19 +1073,22 @@ Return Ravenfall
 * [x] Core Gameplay Loop
 * [x] Technical Stack
 
-## In Progress / Done
+## Done
 
-* [x] Godot Project (Godot 4.7.2, PHASE 0 complete — see docs/roadmap.md)
-* [x] 3D Scenes (test world)
-* [x] Isometric Camera
+* [x] Godot Project (Godot 4.7.2 — PHASE 0 complete)
+* [x] 3D Scenes (isometric test world)
+* [x] Isometric Camera (orthographic, pitch −30° / yaw 45°, follow)
+* [x] Combat Implementation (auto combat, speed order, immediate death)
+* [x] Code Architecture (GameManager, MapManager, CombatManager autoload/scenes)
+* [x] Tree-Map Progression (wolf/boar/treasure → boss unlock, per section 10)
+* [x] Data System — enemies as `.tres` resources (`data/enemies/`)
+* [x] Prototype UI (Ravenfall hub, Blackwood node map, combat w/ HP bars + log)
+* [x] Headless test (`tests/loop_test.tscn` — combat, rewards, map unlock)
 
 ## Not Started
 
-* [ ] Code Architecture (managers beyond GameManager)
-* [ ] Combat Implementation
-* [ ] UI
-* [ ] Data System
-* [ ] Save System
+* [ ] Progression — EXP / Level Up / Shop / Blacksmith / Equipment (PHASE 2 ⬅ NEXT)
+* [ ] Save System (PHASE 6)
 * [ ] Character Assets
 * [ ] Environment Assets
 * [ ] Animation
@@ -1096,35 +1099,42 @@ Return Ravenfall
 
 # 31. Immediate Next Step
 
-## PHASE 0
+## ✅ PHASE 0 + PHASE 1 (Sprint 01) — COMPLETE
 
-Start with:
+The demo loop is playable:
 
 ```text
-1. Install / Open Godot 4.x
-        ↓
-2. Create THE FRONTIER
-        ↓
-3. Create Git Repository
-        ↓
-4. Create Folder Structure
-        ↓
-5. Create Main Scene
-        ↓
-6. Create GameManager
-        ↓
-7. Create PlayerData
-        ↓
-8. Create 3D Test World
-        ↓
-9. Setup Orthographic Camera
-        ↓
-10. Test Isometric View
+Ravenfall
+    ↓
+Blackwood (tree map: Wolf / Boar / Treasure → Boss)
+    ↓
+Automatic Combat
+    ↓
+Reward (+50% Power, +Gold)
+    ↓
+Back to map → clear all nodes → Return to Ravenfall
 ```
 
-After the camera and test world look correct:
+Design note from playtest: the real game needs **more branching paths**
+than the demo's 4-node map → full data-driven maps arrive in PHASE 3.
 
-**→ Start PHASE 1: Gameplay Prototype**
+## PHASE 2 — Progression ⬅ NEXT
+
+```text
+1. EXP + Level Up (stat growth)
+        ↓
+2. Potion Shop (Small Potion +30 HP)
+        ↓
+3. Blacksmith (buy / upgrade weapons)
+        ↓
+4. Inventory + Equipment (stats actually change)
+        ↓
+5. Gold economy has meaning
+```
+
+After Phase 2 works:
+
+**→ PHASE 3: Data-driven maps with 10–15 nodes and branching routes**
 
 ---
 
