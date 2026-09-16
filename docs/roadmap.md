@@ -32,6 +32,18 @@ Ravenfall → Blackwood → Enemy Selection → Auto Combat → Reward → Raven
 - [x] Combat scene with HP bars + battle log
 - [x] Headless test `tests/loop_test.tscn` — full battle vs Wolf verifies Power/Gold/HP
 
-## Phase 2 — Progression ⬅ NEXT
+## Phase 2 — Progression ✅ (2026-09-16) — Prototype 0.2
 
-EXP, Level Up, stat growth, shop/blacksmith, equipment, gold economy
+- [x] EXP + Level Up: enemies grant EXP (Wolf 40 / Boar 60 / Alpha 150), need = level × 100
+- [x] Level-up growth: +20 Max HP, +10 Power, +2 Speed, full heal
+- [x] ItemData resource; items as `.tres` (`data/items/`, `data/equipment/`)
+- [x] Potion Shop: Small Potion +30 HP, 5 gold
+- [x] Blacksmith: Rusty Sword ATK+10 (10g), Reinforced Sword ATK+25 (20g) — weapons own-once
+- [x] Inventory + Bag UI (use potions, equip weapons); combat uses Power + weapon ATK
+- [x] ShopManager autoload; quick potion use on the Blackwood map screen
+- [x] Tests extended: buy/use/equip/level-up all verified headless
+
+## Phase 3 — Data-Driven Content ⬅ NEXT
+
+Maps as data files, Blackwood expanded to 10–15 nodes with branching routes,
+more enemies/items, events

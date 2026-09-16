@@ -39,14 +39,16 @@ func start_combat(enemy: EnemyData, node_id: String = "") -> void:
 	get_tree().change_scene_to_file(SCENE_COMBAT)
 
 
-## README rule: Power reward = Enemy Power × 50%, plus gold.
+## README rule: Power reward = Enemy Power × 50%, plus gold and EXP.
 func apply_victory_rewards(enemy: EnemyData) -> Dictionary:
 	var reward := {
 		"power": enemy.power_reward(),
 		"gold": enemy.gold_reward,
+		"exp": enemy.exp_reward,
 	}
 	player_data.power += reward.power
 	player_data.gold += reward.gold
+	reward["level_ups"] = player_data.gain_exp(enemy.exp_reward)
 	return reward
 
 

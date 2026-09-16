@@ -48,9 +48,13 @@ func _damage_of(power: int) -> int:
 
 
 func _refresh() -> void:
+	player_hp_bar.max_value = _player.max_hp
 	player_hp_bar.value = _player.hp
-	player_stats_label.text = "HP %d/%d   ⚔️ %d   💨 %d" % [
-		_player.hp, _player.max_hp, _player.power, _player.speed
+	var weapon: ItemData = _player.equipped_weapon()
+	var weapon_text := "   %s" % weapon.emoji if weapon else ""
+	player_stats_label.text = "Lv.%d   HP %d/%d   ⚔️ %d%s   💨 %d" % [
+		_player.level, _player.hp, _player.max_hp,
+		_player.attack_power(), weapon_text, _player.speed
 	]
 	enemy_hp_bar.value = _enemy_hp
 	enemy_stats_label.text = "HP %d/%d   ⚔️ %d   💨 %d" % [
@@ -92,7 +96,7 @@ func _run_battle() -> void:
 
 func _player_attack() -> void:
 	await get_tree().create_timer(TURN_DELAY).timeout
-	var dmg := _damage_of(_player.power)
+	var dmg := _damage_of(_player.attack_power())
 	_enemy_hp = maxi(_enemy_hp - dmg, 0)
 	_log("🗡️ Hero hits %s for [color=orange]%d[/color] damage!" % [_enemy.display_name, dmg])
 	if _enemy_hp <= 0:
@@ -114,9 +118,16 @@ func _on_victory() -> void:
 	var reward := GameManager.apply_victory_rewards(_enemy)
 	MapManager.complete_current()
 	_log("\n[b][color=gold]🏆 VICTORY![/color][/b]")
-	_log("✨ Reward: [color=orange]+%d Power[/color], [color=yellow]+%d Gold[/color]" % [
-		reward.power, reward.gold
+	_log("✨ Reward: [color=orange]+%d Power[/color], [color=yellow]+%d Gold[/color], [color=cyan]+%d EXP[/color]" % [
+		reward.power, reward.gold, reward.exp
 	])
+	if reward.level_ups > 0:
+		_log("[b][color=lime]🆙 LEVEL UP! Now Lv.%d[/color][/b] — +%d Max HP, +%d Power, +%d Speed (fully healed!)" % [
+			_player.level,
+			PlayerData.LEVEL_UP_HP * reward.level_ups,
+			PlayerData.LEVEL_UP_POWER * reward.level_ups,
+			PlayerData.LEVEL_UP_SPEED * reward.level_ups,
+		])
 	_refresh()
 	return_button.text = "🌲 Back to the map"
 

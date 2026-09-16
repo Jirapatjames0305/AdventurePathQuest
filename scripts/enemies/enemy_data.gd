@@ -8,6 +8,7 @@ extends Resource
 @export var max_hp: int = 30
 @export var speed: int = 20
 @export var gold_reward: int = 5
+@export var exp_reward: int = 20
 @export_multiline var description: String = ""
 
 

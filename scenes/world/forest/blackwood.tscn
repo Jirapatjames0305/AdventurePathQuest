@@ -55,6 +55,13 @@ theme_override_font_sizes/font_size = 18
 text = "player stats"
 horizontal_alignment = 1
 
+[node name="PotionButton" type="Button" parent="Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "🧪 Use Small Potion"
+
 [node name="ClearedLabel" type="Label" parent="Margin/VBox"]
 unique_name_in_owner = true
 visible = false

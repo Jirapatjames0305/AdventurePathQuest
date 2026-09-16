@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/inventory/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "small_potion"
+display_name = "Small Potion"
+emoji = "🧪"
+type = "potion"
+value = 30
+price = 5
+description = "A gentle red brew. Restores 30 HP."

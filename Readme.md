@@ -1085,9 +1085,11 @@ Return Ravenfall
 * [x] Prototype UI (Ravenfall hub, Blackwood node map, combat w/ HP bars + log)
 * [x] Headless test (`tests/loop_test.tscn` — combat, rewards, map unlock)
 
+* [x] Progression — EXP / Level Up / Potion Shop / Blacksmith / Inventory / Equipment (PHASE 2 — Prototype 0.2)
+
 ## Not Started
 
-* [ ] Progression — EXP / Level Up / Shop / Blacksmith / Equipment (PHASE 2 ⬅ NEXT)
+* [ ] Data-Driven Maps — branching routes, more content (PHASE 3 ⬅ NEXT)
 * [ ] Save System (PHASE 6)
 * [ ] Character Assets
 * [ ] Environment Assets

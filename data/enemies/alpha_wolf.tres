@@ -10,4 +10,5 @@ power = 90
 max_hp = 90
 speed = 55
 gold_reward = 30
+exp_reward = 150
 description = "Leader of the pack. Faster than you — it strikes first!"

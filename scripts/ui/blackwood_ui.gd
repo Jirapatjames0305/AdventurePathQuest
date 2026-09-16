@@ -4,20 +4,32 @@ extends Control
 
 @onready var enemy_list: VBoxContainer = %EnemyList
 @onready var player_stats_label: Label = %PlayerStats
+@onready var potion_button: Button = %PotionButton
 @onready var cleared_label: Label = %ClearedLabel
 @onready var back_button: Button = %BackButton
 
 
 func _ready() -> void:
 	back_button.pressed.connect(GameManager.goto_ravenfall)
+	potion_button.pressed.connect(_on_potion_pressed)
+	_refresh()
+
+
+func _on_potion_pressed() -> void:
+	GameManager.player_data.use_potion()
 	_refresh()
 
 
 func _refresh() -> void:
 	var player := GameManager.player_data
-	player_stats_label.text = "🧙 Hero — HP %d/%d   ⚔️ Power %d   💨 Speed %d   💰 %d Gold" % [
-		player.hp, player.max_hp, player.power, player.speed, player.gold
+	player_stats_label.text = "🧙 Hero Lv.%d — HP %d/%d   ⚔️ %d   💨 %d   💰 %d Gold" % [
+		player.level, player.hp, player.max_hp,
+		player.attack_power(), player.speed, player.gold
 	]
+	var potions: int = player.item_qty("small_potion")
+	potion_button.visible = potions > 0
+	potion_button.text = "🧪 Use Small Potion (×%d) — +30 HP" % potions
+	potion_button.disabled = player.hp >= player.max_hp
 	cleared_label.visible = MapManager.is_map_cleared()
 
 	for child in enemy_list.get_children():
