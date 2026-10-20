@@ -17,6 +17,8 @@ const BASIN_HEIGHT := 0.75
 ## camera), facing the fountain.
 ## Each entry: [angle° around the fountain, awning colour, goods].
 const STALL_RADIUS := 11.8
+## Extra turn for every stall (counter-clockwise seen from above = to the left).
+const STALL_TURN_DEGREES := 15.0
 const STALLS := [
 	[158.0, Color(0.85, 0.3, 0.28), MarketStall.Goods.FRUIT],
 	[180.0, Color(0.3, 0.5, 0.85), MarketStall.Goods.CLOTH],
@@ -95,7 +97,7 @@ func _build_stalls() -> void:
 		stall.seed = i
 		stall.position = Vector3(cos(angle), 0.0, sin(angle)) * STALL_RADIUS
 		# Customer side (+Z) faces the fountain.
-		stall.rotation.y = atan2(-stall.position.x, -stall.position.z)
+		stall.rotation.y = atan2(-stall.position.x, -stall.position.z) + deg_to_rad(STALL_TURN_DEGREES)
 		add_child(stall)
 
 
