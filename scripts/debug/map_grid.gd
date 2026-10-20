@@ -15,9 +15,9 @@ extends Node3D
 const NORTH := Vector3(-1.0, 0.0, 0.0)
 const EAST := Vector3(0.0, 0.0, -1.0)
 
-const EXTENT := 60
-const LINE_STEP := 5
-const LABEL_STEP := 10
+const EXTENT := 300
+const LINE_STEP := 10
+const LABEL_STEP := 30
 const LINE_HEIGHT := 0.09
 const MINOR_COLOR := Color(1, 1, 1, 0.25)
 const MAJOR_COLOR := Color(1, 1, 1, 0.55)

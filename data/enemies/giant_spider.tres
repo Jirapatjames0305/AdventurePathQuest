@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+model = "spider"
+display_name = "Giant Spider"
+emoji = "🕷️"
+power = 55
+max_hp = 70
+speed = 50
+gold_reward = 15
+exp_reward = 80
+description = "Lurks where the pines grow thick. Quick and venomous."

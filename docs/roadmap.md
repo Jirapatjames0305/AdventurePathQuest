@@ -50,7 +50,7 @@ becomes an open world where the hero walks out of Ravenfall into the wilds and
 fights monsters in real time where they stand. Full spec and the OW1–OW6 plan:
 [game_design.md → Direction change](game_design.md#direction-change-2026-10-20-open-world--real-time-action-combat).
 
-- [ ] OW1 Seamless world (town → road → Blackwood in one scene)
+- [x] OW1 Seamless world (town → road → Blackwood in one scene, 10 monster types in camps)
 - [ ] OW2 Hero combat (attack, dodge, HP HUD, potion hotkey)
 - [ ] OW3 Monster AI (wander, aggro, chase, telegraphed attack, leash)
 - [ ] OW4 Rewards, death and respawn

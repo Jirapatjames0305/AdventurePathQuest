@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+model = "treant"
+display_name = "Treant Sapling"
+emoji = "🌳"
+power = 60
+max_hp = 120
+speed = 15
+gold_reward = 18
+exp_reward = 100
+description = "A young tree spirit. Slow to anger, hard to fell."

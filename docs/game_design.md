@@ -48,11 +48,32 @@ stand** — no separate combat screen, no clicking an enemy card.
 - Same isometric camera that follows the hero; the minimap grows to show the region around the hero.
 - Region edges and locked future areas (Crystal Caves, Ancient Ruins, Saltmere Harbor) are blocked by terrain or gates for now.
 
+### Blackwood region (OW1, built)
+
+`scripts/world/forest_region.gd`, placed in `scenes/main.tscn`. The forest starts at the south gate and covers x 70–295, z −115–115 (about twice the town). It has about 1,500 MultiMesh trees, dirt trails from the road to every clearing, rocks and glowing mushrooms, and invisible walls round town + forest. Trees between the camera and the hero dither away (`shaders/forest_foliage.gdshader`). The minimap shows the town while you're inside and switches to the forest view outside the gate, with red camp dots and a purple lair dot.
+
+Monsters stand in camps, one type per camp, weaker near town and stronger deeper in. They are idle for now; AI comes in OW3.
+
+| Tier | Monster | Model | Power | HP | Gold | EXP | Camps (count) |
+|---|---|---|---|---|---|---|---|
+| 1 | Green Slime | slime | 15 | 25 | 4 | 15 | 2 (5, 4) |
+| 1 | Forest Bat | bat | 20 | 20 | 5 | 20 | 2 (4, 4) |
+| 1 | Shroomling | shroom | 22 | 35 | 6 | 25 | 2 (4, 3) |
+| 2 | Forest Wolf | wolf | 30 | 40 | 8 | 40 | 2 (4, 3) + 2 lair guards |
+| 2 | Thorn Beetle | beetle | 35 | 70 | 10 | 45 | 1 (3) |
+| 2 | Wild Boar | boar | 45 | 60 | 12 | 60 | 1 (3) |
+| 2 | Giant Spider | spider | 55 | 70 | 15 | 80 | 1 (3) |
+| 3 | Treant Sapling | treant | 60 | 120 | 18 | 100 | 1 (3) |
+| 3 | Brown Bear | bear | 80 | 140 | 25 | 130 | 1 (2) |
+| Boss | Alpha Wolf | alpha | 90 | 90 | 30 | 150 | Lair at the far end (1), ring of standing stones |
+
+The old gate trigger that opened the world map is gone; walking out of the gate leads straight into the forest.
+
 ### Phased plan
 
 | # | Step | Done when |
 |---|---|---|
-| ⬜ OW1 | **Seamless world:** extend the ground beyond the gate, road into a Blackwood region built in the same scene (reuse the 3D forest from V8) | Walk from the fountain to Blackwood without a loading screen |
+| ✅ OW1 | **Seamless world:** extend the ground beyond the gate, road into a Blackwood region built in the same scene (reuse the 3D forest from V8) | Walk from the fountain to Blackwood without a loading screen |
 | ⬜ OW2 | **Hero combat:** attack (click / J) with swing animation + hitbox, dodge roll, hero HP in HUD, potion hotkey | Hero can swing and dodge anywhere |
 | ⬜ OW3 | **Monster AI:** wander, aggro, chase, telegraphed attack, leash, HP bars, hit reactions, death | A wolf notices you, attacks, and can be killed |
 | ⬜ OW4 | **Rewards & death:** gold / EXP / Power / quest progress on kill, level-up burst, faint → wake in town, respawn timers | A full hunt loop works with the guild quests |

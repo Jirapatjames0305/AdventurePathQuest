@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+model = "bear"
+display_name = "Brown Bear"
+emoji = "🐻"
+power = 80
+max_hp = 140
+speed = 30
+gold_reward = 25
+exp_reward = 130
+description = "The biggest beast of Blackwood short of the Alpha."

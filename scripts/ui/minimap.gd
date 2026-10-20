@@ -1,5 +1,6 @@
 extends Control
-## Round minimap (top-left) showing the whole walled town. Rotated to match the
+## Round minimap (top-left) showing the whole walled town — or, once the hero
+## walks out of the gate, the whole forest beyond it with its monster camps. Rotated to match the
 ## isometric camera (up on the map = up on screen) and drawn from the live
 ## scene: town wall + gate, roads, plaza + fountain, park pond, every building
 ## in the "house" group (shops coloured and labelled). The hero is an arrow
@@ -27,6 +28,10 @@ const PLAYER := Color(1.0, 0.97, 0.85)
 ## Tree dots by TreeFactory.Kind (leafy, pine, blossom) and their radius in metres.
 const TREE_COLORS := [Color(0.27, 0.5, 0.22), Color(0.16, 0.36, 0.2), Color(0.96, 0.66, 0.76)]
 const TREE_RADIUS := 1.6
+const FOREST := Color(0.3, 0.44, 0.26)
+const DIRT := Color(0.66, 0.54, 0.38)
+const CAMP := Color(0.95, 0.35, 0.3)
+const BOSS := Color(0.75, 0.15, 0.55)
 
 ## Building node name -> [label, colour]. Unlisted buildings draw as plain houses.
 const SHOPS := {
@@ -44,7 +49,16 @@ var _player: Node3D
 var _scale := 1.0
 ## Map-space point shown at the centre of the disc (the town's centre).
 var _focus := Vector2.ZERO
+## [focus, scale] fitting the town and the forest; _focus/_scale ease between them.
+var _town_view := []
+var _forest_view := []
+var _forest := PackedVector2Array()
+var _trails: Array = []  # [Vector2, Vector2] map space
+## Each: {"at": Vector2, "label": String, "boss": bool}
+var _camps: Array[Dictionary] = []
 var _map: Control
+## The hero arrow on its own layer, so the (static) map only redraws when the view moves.
+var _marker: Control
 ## Map geometry in metres along the screen axes.
 var _wall := PackedVector2Array()
 var _gates: Array[Vector2] = []
@@ -56,6 +70,7 @@ var _trees: Array = []  # [map position, TreeFactory.Kind]
 ## Each: {"poly": PackedVector2Array, "center": Vector2, "label": String, "color": Color}
 var _buildings: Array[Dictionary] = []
 var _ready_to_draw := false
+var _drawn := false
 
 
 func _ready() -> void:
@@ -75,6 +90,11 @@ func _ready() -> void:
 	_map.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_map.draw.connect(_draw_map)
 	mask.add_child(_map)
+	_marker = Control.new()
+	_marker.size = size
+	_marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_marker.draw.connect(func(): _draw_player(_marker, size / 2.0 + (_uv(_player.global_position) - _focus) * _scale) if _player and _ready_to_draw else null)
+	mask.add_child(_marker)
 	var frame := Control.new()
 	frame.size = size
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -84,9 +104,29 @@ func _ready() -> void:
 	_collect.call_deferred()
 
 
-func _process(_delta: float) -> void:
-	if _ready_to_draw:
+func _process(delta: float) -> void:
+	if not _ready_to_draw:
+		return
+	var outside := _player != null and not _forest_view.is_empty() and _player.global_position.x > TownWall.BOUNDS.end.x + 2.0
+	var view: Array = _forest_view if outside else _town_view
+	var k := 1.0 - exp(-delta * 6.0)
+	var focus: Vector2 = _focus.lerp(view[0], k)
+	var zoom := lerpf(_scale, view[1], k)
+	if focus.distance_to(_focus) > 0.01 or absf(zoom - _scale) > 0.0001 or not _drawn:
+		_focus = focus
+		_scale = zoom
+		_drawn = true
 		_map.queue_redraw()
+	_marker.queue_redraw()
+
+
+## [focus, scale] that fits a world-space rectangle inside the disc.
+func _fit(rect: Rect2) -> Array:
+	var focus := _uv(Vector3(rect.get_center().x, 0, rect.get_center().y))
+	var reach := 0.0
+	for c in [rect.position, Vector2(rect.end.x, rect.position.y), rect.end, Vector2(rect.position.x, rect.end.y)]:
+		reach = maxf(reach, _uv(Vector3(c.x, 0, c.y)).distance_to(focus))
+	return [focus, (DIAMETER / 2.0 - FIT_MARGIN) / reach]
 
 
 static func _uv(world: Vector3) -> Vector2:
@@ -100,11 +140,9 @@ func _collect() -> void:
 			Vector3(bounds.end.x, 0, bounds.end.y), Vector3(bounds.position.x, 0, bounds.end.y)]:
 		_wall.append(_uv(c))
 	# Fit the whole town inside the disc.
-	_focus = _uv(Vector3(bounds.get_center().x, 0, bounds.get_center().y))
-	var reach := 0.0
-	for corner in _wall:
-		reach = maxf(reach, corner.distance_to(_focus))
-	_scale = (DIAMETER / 2.0 - FIT_MARGIN) / reach
+	_town_view = _fit(bounds)
+	_focus = _town_view[0]
+	_scale = _town_view[1]
 	for gate in TownWall.GATES:
 		match gate[0]:
 			"x+": _gates.append(_uv(Vector3(bounds.end.x, 0, gate[1])))
@@ -129,6 +167,16 @@ func _collect() -> void:
 			var a := TAU * i / 28.0
 			pond.append(_uv(park.to_global(Vector3(cos(a) * Park.POND_RADII.x, 0, sin(a) * Park.POND_RADII.y))))
 		_ponds.append(pond)
+	for forest in get_tree().get_nodes_in_group("forest_region"):
+		var r: Rect2 = forest.BOUNDS
+		_forest_view = _fit(r.grow_individual(-2, 2, 2, 2))
+		for c in [r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]:
+			_forest.append(_uv(Vector3(c.x, 0, c.y)))
+		for seg in forest.trails:
+			_trails.append([_uv(Vector3(seg[0].x, 0, seg[0].y)), _uv(Vector3(seg[1].x, 0, seg[1].y))])
+		for camp in forest.camps:
+			var enemy: EnemyData = camp.enemy
+			_camps.append({"at": _uv(camp.center), "label": enemy.display_name, "boss": enemy.model == "alpha"})
 	for source in get_tree().get_nodes_in_group("tree_source"):
 		for tree in source.trees:
 			_trees.append([_uv(tree[0]), tree[1]])
@@ -159,6 +207,10 @@ func _draw_map() -> void:
 		return
 	var center := size / 2.0
 	_map.draw_set_transform(center - _focus * _scale, 0.0, Vector2.ONE * _scale)
+	if not _forest.is_empty():
+		_map.draw_colored_polygon(_forest, FOREST)
+	for trail in _trails:
+		_map.draw_line(trail[0], trail[1], DIRT, 3.0)
 	_map.draw_colored_polygon(_wall, GRASS)
 	for square in _squares:
 		_map.draw_colored_polygon(square, SQUARE)
@@ -183,14 +235,19 @@ func _draw_map() -> void:
 	_map.draw_polyline(outline, WALL, 2.2)
 	for gate in _gates:
 		_map.draw_circle(gate, 2.6, GOLD)
+	for camp in _camps:
+		var r := 7.0 if camp.boss else 4.5
+		_map.draw_circle(camp.at, r + 1.2, Color(0.1, 0.05, 0.05, 0.8))
+		_map.draw_circle(camp.at, r, BOSS if camp.boss else CAMP)
 	_map.draw_set_transform(Vector2.ZERO)
 	var font := get_theme_default_font()
 	for building in _buildings:
 		if building.label == "":
 			continue
 		_label(font, building.label, center + (building.center - _focus) * _scale)
-	if _player:
-		_draw_player(_map, center + (_uv(_player.global_position) - _focus) * _scale)
+	for camp in _camps:
+		if camp.boss:
+			_label(font, "Lair", center + (camp.at - _focus) * _scale + Vector2(0, -13))
 
 
 ## Gold ring and north tab (drawn above the clipped map).
