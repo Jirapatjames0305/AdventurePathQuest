@@ -19,6 +19,7 @@
 [ext_resource type="Script" path="res://scripts/world/town_wall.gd" id="17_wall"]
 [ext_resource type="Script" path="res://scripts/world/town_trees.gd" id="18_trees"]
 [ext_resource type="Script" path="res://scripts/world/building_planting.gd" id="19_planting"]
+[ext_resource type="Script" path="res://scripts/ui/minimap.gd" id="20_minimap"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.5, 0.6, 0.8, 1)
@@ -354,3 +355,11 @@ player_path = NodePath("../Player")
 script = ExtResource("15_fader")
 camera_path = NodePath("../CameraRig/Camera3D")
 player_path = NodePath("../Player")
+
+[node name="MinimapLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="Minimap" type="Control" parent="MinimapLayer"]
+layout_mode = 3
+script = ExtResource("20_minimap")
+player_path = NodePath("../../Player")
