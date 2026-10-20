@@ -20,6 +20,7 @@
 [ext_resource type="Script" path="res://scripts/world/town_trees.gd" id="18_trees"]
 [ext_resource type="Script" path="res://scripts/world/building_planting.gd" id="19_planting"]
 [ext_resource type="Script" path="res://scripts/ui/minimap.gd" id="20_minimap"]
+[ext_resource type="Script" path="res://scripts/ui/compass_rose.gd" id="21_compass"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.5, 0.6, 0.8, 1)
@@ -363,3 +364,7 @@ layer = 10
 layout_mode = 3
 script = ExtResource("20_minimap")
 player_path = NodePath("../../Player")
+
+[node name="Compass" type="Control" parent="MinimapLayer"]
+layout_mode = 3
+script = ExtResource("21_compass")

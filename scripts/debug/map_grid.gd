@@ -1,9 +1,10 @@
 class_name MapGrid
 extends Node3D
-## Design aid: a lat/long grid on the ground plus a compass and the hero's
+## Design aid: a lat/long grid on the ground plus the hero's
 ## current coordinates, so map positions can be described exactly.
 ## Directions follow the town layout (buildings, roads and the plaza square
-## are aligned to the world axes), so the compass is diagonal on screen:
+## are aligned to the world axes), so directions are diagonal on screen
+## (the compass rose is scripts/ui/compass_rose.gd):
 ##   North = up-left, East = up-right, South = down-right, West = down-left.
 ## Origin (lat 0, long 0) is the town fountain; 1 unit = 1 world metre.
 ## Press G to toggle the grid, P to mark the hero's current spot.
@@ -131,33 +132,13 @@ func _build_labels() -> void:
 			add_child(label)
 
 
-## Compass (top-right) and the hero's coordinates (top-center).
+## The hero's coordinates (top-center) and a legend (bottom-left).
 func _build_hud() -> void:
 	var hud := CanvasLayer.new()
 	hud.name = "MapHud"
 	hud.layer = 10
 	add_child(hud)
 
-	# Diagonal compass (top-right): letters sit where each direction points on screen.
-	var compass := Control.new()
-	compass.anchor_left = 1.0
-	compass.anchor_right = 1.0
-	compass.offset_left = -180.0
-	compass.offset_top = 20.0
-	hud.add_child(compass)
-	var center := Vector2(80, 80)
-	for entry in [["N", Vector2(-1, -1)], ["E", Vector2(1, -1)], ["S", Vector2(1, 1)], ["W", Vector2(-1, 1)], ["✛", Vector2.ZERO]]:
-		var letter := Label.new()
-		letter.text = entry[0]
-		letter.add_theme_font_size_override("font_size", 34 if entry[0] != "N" else 40)
-		letter.add_theme_color_override("font_color", Color(1.0, 0.4, 0.35) if entry[0] == "N" else Color.WHITE)
-		letter.add_theme_color_override("font_outline_color", Color.BLACK)
-		letter.add_theme_constant_override("outline_size", 10)
-		letter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		letter.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		letter.size = Vector2(50, 50)
-		letter.position = center + entry[1] * 48.0 - letter.size / 2.0
-		compass.add_child(letter)
 
 	_readout = Label.new()
 	_readout.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
