@@ -27,9 +27,7 @@ const SEED := 4242
 const STONE := Color(0.7, 0.68, 0.63)
 const WOOD := Color(0.5, 0.33, 0.2)
 const IRON := Color(0.15, 0.15, 0.17)
-const TRUNK := Color(0.42, 0.28, 0.17)
 const LEAVES := [Color(0.3, 0.55, 0.25), Color(0.38, 0.62, 0.28), Color(0.25, 0.48, 0.22), Color(0.45, 0.65, 0.3)]
-const PINE := Color(0.2, 0.42, 0.25)
 const LILY := Color(0.3, 0.6, 0.3)
 const BLOSSOM := Color(1.0, 0.75, 0.85)
 const LAMP_GLOW := Color(1.0, 0.75, 0.4)
@@ -37,6 +35,7 @@ const FLOWERS := [Color(0.95, 0.35, 0.4), Color(0.98, 0.8, 0.3), Color(0.75, 0.4
 const WATER_SHADER := preload("res://shaders/fountain_water.gdshader")
 
 var _materials := {}
+var _tree_factory := TreeFactory.new()
 var _rng := RandomNumberGenerator.new()
 var _body: StaticBody3D
 ## All path polylines (loop included), for keeping trees and props off them.
@@ -44,6 +43,7 @@ var _path_lines: Array[PackedVector3Array] = []
 
 
 func _ready() -> void:
+	add_to_group("park")
 	_rng.seed = SEED
 	_body = StaticBody3D.new()
 	add_child(_body)
@@ -239,10 +239,13 @@ func _trees() -> void:
 		if crowded:
 			continue
 		placed.append(at)
-		if _rng.randf() < 0.3:
-			_pine(at, _rng.randf_range(0.9, 1.35))
-		else:
-			_round_tree(at, _rng.randf_range(0.8, 1.35))
+		_tree_factory.random_tree(self, _body, at, _rng)
+
+
+## World-space test used by the town tree scatter: is `point` in the park?
+func contains(point: Vector3) -> bool:
+	var local := to_local(point)
+	return Vector2(local.x / TREE_AREA.x, local.z / TREE_AREA.y).length() < 1.15
 
 
 ## Open lawn between the pond and the loop path stays clear.
@@ -259,63 +262,26 @@ func _blocked(at: Vector3) -> bool:
 	return false
 
 
-func _round_tree(at: Vector3, size: float) -> void:
-	_cylinder(0.18 * size, 0.26 * size, 2.2 * size, "trunk", at, 8)
-	var leaves := "leaves%d" % (_rng.randi() % LEAVES.size())
-	for n in 3:
-		var crown := SphereMesh.new()
-		crown.radius = (1.3 - n * 0.2) * size
-		crown.height = crown.radius * 1.8
-		crown.radial_segments = 10
-		crown.rings = 5
-		var offset := Vector3(_rng.randf_range(-0.5, 0.5), 2.6 + n * 0.7, _rng.randf_range(-0.5, 0.5)) * size
-		_mesh(crown, leaves, at + offset)
-	_trunk_collider(at, 0.35 * size)
-
-
-func _pine(at: Vector3, size: float) -> void:
-	_cylinder(0.16 * size, 0.22 * size, 1.2 * size, "trunk", at, 8)
-	for n in 3:
-		var radius := (1.5 - n * 0.4) * size
-		_cylinder(0.0, radius, 1.8 * size, "pine", at + Vector3.UP * (0.9 + n * 1.1) * size, 10)
-	_trunk_collider(at, 0.3 * size)
-
-
-func _trunk_collider(at: Vector3, radius: float) -> void:
-	var shape := CollisionShape3D.new()
-	var cylinder := CylinderShape3D.new()
-	cylinder.radius = radius
-	cylinder.height = 3.0
-	shape.shape = cylinder
-	shape.position = at + Vector3.UP * 1.5
-	_body.add_child(shape)
-
-
 func _material(key: String) -> StandardMaterial3D:
 	if _materials.has(key):
 		return _materials[key]
 	var material := StandardMaterial3D.new()
 	material.roughness = 0.9
-	if key.begins_with("leaves"):
-		material.albedo_color = LEAVES[int(key.substr(6))]
-	else:
-		match key:
-			"stone": material.albedo_color = STONE
-			"wood": material.albedo_color = WOOD
-			"trunk": material.albedo_color = TRUNK
-			"pine": material.albedo_color = PINE
-			"lily": material.albedo_color = LILY
-			"blossom": material.albedo_color = BLOSSOM
-			"soil": material.albedo_color = Color(0.36, 0.25, 0.16)
-			"iron":
-				material.albedo_color = IRON
-				material.metallic = 0.6
-				material.roughness = 0.45
-			"lamp":
-				material.albedo_color = LAMP_GLOW
-				material.emission_enabled = true
-				material.emission = LAMP_GLOW
-				material.emission_energy_multiplier = 3.0
+	match key:
+		"stone": material.albedo_color = STONE
+		"wood": material.albedo_color = WOOD
+		"lily": material.albedo_color = LILY
+		"blossom": material.albedo_color = BLOSSOM
+		"soil": material.albedo_color = Color(0.36, 0.25, 0.16)
+		"iron":
+			material.albedo_color = IRON
+			material.metallic = 0.6
+			material.roughness = 0.45
+		"lamp":
+			material.albedo_color = LAMP_GLOW
+			material.emission_enabled = true
+			material.emission = LAMP_GLOW
+			material.emission_energy_multiplier = 3.0
 	_materials[key] = material
 	return material
 
