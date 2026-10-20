@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/characters/character_model.gd" id="4_model"]
 [ext_resource type="Script" path="res://scripts/world/town_square.gd" id="5_square"]
 [ext_resource type="Script" path="res://scripts/world/guild_hall.gd" id="6_guild"]
+[ext_resource type="Script" path="res://scripts/debug/map_grid.gd" id="7_grid"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.5, 0.6, 0.8, 1)
@@ -103,6 +104,7 @@ size = 18.0
 far = 120.0
 
 [node name="RavenfallUI" type="CanvasLayer" parent="."]
+visible = false
 script = ExtResource("3_ui")
 
 [node name="StatsPanel" type="PanelContainer" parent="RavenfallUI"]
@@ -237,3 +239,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "✖ Close"
+
+[node name="MapGrid" type="Node3D" parent="."]
+script = ExtResource("7_grid")
+player_path = NodePath("../Player")
