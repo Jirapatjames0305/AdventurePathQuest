@@ -30,10 +30,26 @@ const ROADS := [
 	[0, -6, "hex_road_A", -60.0],
 ]
 
+## Ravenfall locations (README §9). Each entry: [q, r, model, collision radius].
+## Buildings turn to face the town square.
+const BUILDINGS := [
+	[1, -1, "building_tavern_red", 1.6],      # Rest
+	[-1, 0, "building_market_red", 1.6],      # Potion Shop
+	[1, 0, "building_blacksmith_red", 1.6],   # Blacksmith
+	[0, 1, "building_well_red", 0.9],         # Town Square well
+	[-1, 1, "building_home_A_red", 1.4],
+	[-2, 0, "building_church_red", 1.6],      # Old Chapel
+	[2, 1, "building_destroyed", 1.4],        # Abandoned House
+	[-2, 2, "building_home_B_red", 1.4],
+	[1, 1, "building_home_A_red", 1.4],
+	[2, -2, "building_windmill_red", 1.6],
+]
+
 
 func _ready() -> void:
 	rotation_degrees.y = ROAD_ALIGN_DEGREES
 	_build_ground()
+	_build_buildings()
 	_build_walls()
 
 
@@ -67,6 +83,23 @@ func _build_ground() -> void:
 				_place("hex_grass", q, r)
 			else:
 				_place(road[2], q, r, road[3])
+
+
+func _build_buildings() -> void:
+	var body := StaticBody3D.new()
+	body.name = "BuildingColliders"
+	add_child(body)
+	for building in BUILDINGS:
+		var node := _place(building[2], building[0], building[1])
+		var to_square := -node.position
+		node.rotation.y = atan2(to_square.x, to_square.z)
+		var shape := CollisionShape3D.new()
+		var cylinder := CylinderShape3D.new()
+		cylinder.radius = building[3]
+		cylinder.height = 4.0
+		shape.shape = cylinder
+		shape.position = node.position + Vector3.UP * 2.0
+		body.add_child(shape)
 
 
 ## Invisible ring of walls so the hero can't walk off the edge of town.
