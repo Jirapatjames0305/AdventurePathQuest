@@ -12,10 +12,24 @@ const STONE_DARK := Color(0.6, 0.58, 0.54)
 const BASIN_RADIUS := 3.0
 const BASIN_HEIGHT := 0.75
 
+## Market stalls on the brick plaza, in the top-left and bottom-right corners
+## of the screen (world −X and +X with the isometric camera).
+## Each entry: [angle° around the fountain, awning colour, goods].
+const STALL_RADIUS := 7.6
+const STALLS := [
+	[155.0, Color(0.85, 0.3, 0.28), MarketStall.Goods.FRUIT],
+	[180.0, Color(0.3, 0.5, 0.85), MarketStall.Goods.CLOTH],
+	[205.0, Color(0.95, 0.75, 0.3), MarketStall.Goods.POTTERY],
+	[-25.0, Color(0.4, 0.7, 0.45), MarketStall.Goods.POTTERY],
+	[0.0, Color(0.85, 0.45, 0.65), MarketStall.Goods.FRUIT],
+	[25.0, Color(0.95, 0.55, 0.25), MarketStall.Goods.CLOTH],
+]
+
 
 func _ready() -> void:
 	_build_plaza()
 	_build_fountain()
+	_build_stalls()
 
 
 func _build_plaza() -> void:
@@ -68,6 +82,20 @@ func _build_fountain() -> void:
 	shape.position.y = 1.5
 	body.add_child(shape)
 	fountain.add_child(body)
+
+
+func _build_stalls() -> void:
+	for i in STALLS.size():
+		var angle := deg_to_rad(STALLS[i][0])
+		var stall := MarketStall.new()
+		stall.name = "Stall%d" % i
+		stall.awning_color = STALLS[i][1]
+		stall.goods = STALLS[i][2]
+		stall.seed = i
+		stall.position = Vector3(cos(angle), 0.0, sin(angle)) * STALL_RADIUS
+		# Customer side (+Z) faces the fountain.
+		stall.rotation.y = atan2(-stall.position.x, -stall.position.z)
+		add_child(stall)
 
 
 func _stone(color: Color) -> StandardMaterial3D:
