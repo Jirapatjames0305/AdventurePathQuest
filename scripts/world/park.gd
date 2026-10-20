@@ -94,6 +94,7 @@ func _pond() -> void:
 	material.shader = WATER_SHADER
 	material.set_shader_parameter("radius", 1.0)
 	material.set_shader_parameter("ripple_density", 3.0)
+	material.set_shader_parameter("ripple_speed", 0.0)  # still pond surface
 	var water_node := _mesh(water, "", Vector3(0, 0.05, 0))
 	water_node.material_override = material
 	water_node.scale = Vector3(POND_RADII.x, 1.0, POND_RADII.y)
