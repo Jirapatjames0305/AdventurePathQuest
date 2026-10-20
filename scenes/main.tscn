@@ -4,7 +4,6 @@
 [ext_resource type="Script" uid="uid://cn3q60t01bw0u" path="res://scripts/world/camera_rig.gd" id="2_camrig"]
 [ext_resource type="Script" path="res://scripts/ui/ravenfall_ui.gd" id="3_ui"]
 [ext_resource type="Script" path="res://scripts/characters/character_model.gd" id="4_model"]
-[ext_resource type="Script" path="res://scripts/world/ravenfall_village.gd" id="5_village"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.5, 0.6, 0.8, 1)
@@ -37,7 +36,14 @@ adjustment_enabled = true
 adjustment_saturation = 1.05
 
 [sub_resource type="BoxShape3D" id="FloorShape"]
-size = Vector3(140, 0.2, 140)
+size = Vector3(60, 0.2, 60)
+
+[sub_resource type="PlaneMesh" id="FloorMesh"]
+size = Vector2(60, 60)
+
+[sub_resource type="StandardMaterial3D" id="FloorMat"]
+albedo_color = Color(0.45, 0.65, 0.35, 1)
+roughness = 0.9
 
 [sub_resource type="CapsuleShape3D" id="PlayerShape"]
 radius = 0.4
@@ -58,15 +64,16 @@ shadow_blur = 1.5
 
 [node name="Floor" type="StaticBody3D" parent="." unique_id=1953586538]
 
+[node name="FloorMesh" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("FloorMesh")
+surface_material_override/0 = SubResource("FloorMat")
+
 [node name="FloorCollision" type="CollisionShape3D" parent="Floor" unique_id=702463848]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
 shape = SubResource("FloorShape")
 
-[node name="Village" type="Node3D" parent="."]
-script = ExtResource("5_village")
-
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1249246146]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.07, 1, 7.07)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("1_player")
 
 [node name="Model" type="Node3D" parent="Player"]
