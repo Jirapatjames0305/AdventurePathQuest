@@ -22,6 +22,12 @@ const BASIN_HEIGHT := 0.75
 const STALL_RADIUS := 11.8
 ## Extra turn for every stall (counter-clockwise seen from above = to the left).
 const STALL_TURN_DEGREES := 0.0
+## Space a stall (with its crate) needs, as a radius around its centre.
+const STALL_CLEARANCE := 2.2
+## Extra clear space either side of a road's lane into the square.
+const LANE_MARGIN := 0.8
+## A stall that blocks a lane slides round the square in steps of this many degrees.
+const STALL_NUDGE_DEGREES := 3.0
 const STALLS := [
 	[158.0, Color(0.85, 0.3, 0.28), MarketStall.Goods.FRUIT],
 	[180.0, Color(0.3, 0.5, 0.85), MarketStall.Goods.CLOTH],
@@ -38,7 +44,8 @@ func _ready() -> void:
 	_build_square_floor()
 	_build_plaza()
 	_build_fountain()
-	_build_stalls()
+	# Stalls keep road entrances clear, so they need every road registered first.
+	_build_stalls.call_deferred()
 	# Raised kerb round the square, open where roads come in (needs roads registered).
 	_build_kerb.call_deferred()
 
@@ -122,8 +129,11 @@ func _build_fountain() -> void:
 
 
 func _build_stalls() -> void:
+	var lanes := _road_lanes()
+	var placed: Array[Vector3] = []
 	for i in STALLS.size():
-		var angle := deg_to_rad(STALLS[i][0])
+		var angle := _free_angle(STALLS[i][0], lanes, placed)
+		placed.append(Vector3(cos(angle), 0.0, sin(angle)) * STALL_RADIUS)
 		var stall := MarketStall.new()
 		stall.name = "Stall%d" % i
 		stall.awning_color = STALLS[i][1]
@@ -133,6 +143,53 @@ func _build_stalls() -> void:
 		# Customer side (+Z) faces the fountain.
 		stall.rotation.y = atan2(-stall.position.x, -stall.position.z) + deg_to_rad(STALL_TURN_DEGREES)
 		add_child(stall)
+
+
+## Lanes into the square: for each road ending at the square's edge, the
+## strip continuing straight in toward the fountain. Each lane is
+## [start, end, half width] in this node's local space.
+func _road_lanes() -> Array:
+	var lanes := []
+	for road in get_tree().get_nodes_in_group("roads"):
+		var corners: PackedVector3Array = road.corners
+		for end_index in [0, corners.size() - 1]:
+			var neighbour := 1 if end_index == 0 else corners.size() - 2
+			var tip := to_local(road.to_global(corners[end_index]))
+			var before := to_local(road.to_global(corners[neighbour]))
+			var edge_distance := maxf(absf(tip.x), absf(tip.z))
+			if absf(edge_distance - SQUARE_HALF_SIZE) > 1.5:
+				continue
+			var inward := (tip - before).normalized()
+			var reach := edge_distance - PLAZA_RADIUS + 1.0
+			lanes.append([tip, tip + inward * reach, road.width / 2.0 + LANE_MARGIN])
+	return lanes
+
+
+## The angle (radians) nearest `degrees` where a stall clears every lane and
+## every stall already placed.
+func _free_angle(degrees: float, lanes: Array, placed: Array[Vector3]) -> float:
+	for step in 61:
+		for direction in [1.0, -1.0]:
+			var angle := deg_to_rad(degrees + direction * step * STALL_NUDGE_DEGREES)
+			var at := Vector3(cos(angle), 0.0, sin(angle)) * STALL_RADIUS
+			if _stall_fits(at, lanes, placed):
+				return angle
+			if step == 0:
+				break
+	return deg_to_rad(degrees)
+
+
+func _stall_fits(at: Vector3, lanes: Array, placed: Array[Vector3]) -> bool:
+	var flat := Vector2(at.x, at.z)
+	for lane in lanes:
+		var a := Vector2(lane[0].x, lane[0].z)
+		var b := Vector2(lane[1].x, lane[1].z)
+		if flat.distance_to(Geometry2D.get_closest_point_to_segment(flat, a, b)) < lane[2] + STALL_CLEARANCE:
+			return false
+	for other in placed:
+		if other.distance_to(at) < STALL_CLEARANCE * 1.6:
+			return false
+	return true
 
 
 func _stone(color: Color) -> StandardMaterial3D:
