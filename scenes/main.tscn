@@ -39,10 +39,10 @@ adjustment_enabled = true
 adjustment_saturation = 1.05
 
 [sub_resource type="BoxShape3D" id="FloorShape"]
-size = Vector3(120, 0.2, 120)
+size = Vector3(400, 0.2, 400)
 
 [sub_resource type="PlaneMesh" id="FloorMesh"]
-size = Vector2(120, 120)
+size = Vector2(400, 400)
 
 [sub_resource type="StandardMaterial3D" id="FloorMat"]
 albedo_color = Color(0.45, 0.65, 0.35, 1)
