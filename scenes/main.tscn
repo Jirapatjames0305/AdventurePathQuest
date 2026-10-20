@@ -25,12 +25,6 @@ ssao_enabled = true
 [sub_resource type="BoxShape3D" id="FloorShape"]
 size = Vector3(40, 0.2, 40)
 
-[sub_resource type="BoxMesh" id="PropMesh"]
-size = Vector3(1.2, 1.2, 1.2)
-
-[sub_resource type="StandardMaterial3D" id="PropMat"]
-albedo_color = Color(0.55, 0.42, 0.3, 1)
-
 [sub_resource type="CapsuleShape3D" id="PlayerShape"]
 radius = 0.4
 height = 1.6
@@ -53,23 +47,6 @@ shape = SubResource("FloorShape")
 
 [node name="Village" type="Node3D" parent="."]
 script = ExtResource("5_village")
-
-[node name="Props" type="Node3D" parent="." unique_id=394074648]
-
-[node name="Crate1" type="MeshInstance3D" parent="Props" unique_id=272573728]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.6, -3)
-mesh = SubResource("PropMesh")
-surface_material_override/0 = SubResource("PropMat")
-
-[node name="Crate2" type="MeshInstance3D" parent="Props" unique_id=1209101454]
-transform = Transform3D(0.866, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866, -5, 0.6, 2)
-mesh = SubResource("PropMesh")
-surface_material_override/0 = SubResource("PropMat")
-
-[node name="Crate3" type="MeshInstance3D" parent="Props" unique_id=2030491257]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.6, 6)
-mesh = SubResource("PropMesh")
-surface_material_override/0 = SubResource("PropMat")
 
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1249246146]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

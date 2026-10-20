@@ -14,6 +14,11 @@ const GROUND_RINGS := 6
 ## The player can walk this far from the town center.
 const WALK_RADIUS := 16.0
 const WALL_SEGMENTS := 24
+## Hex-pack props (barrels, crates…) are modelled at map scale; this makes
+## them hero-sized.
+const PROP_SCALE := 6.0
+## Fixed seed so the scattered nature looks the same every visit.
+const NATURE_SEED := 20261020
 ## Turns the whole town so the Blackwood road points straight up the screen
 ## (the hex road axis is 15° off the isometric camera's "up").
 const ROAD_ALIGN_DEGREES := 15.0
@@ -45,11 +50,38 @@ const BUILDINGS := [
 	[2, -2, "building_windmill_red", 1.6],
 ]
 
+## Nature by ring (distance from the square). Ring 3 is the walkable edge,
+## rings 4–6 frame the town and hide the island's edge.
+const EDGE_SCATTER := ["tree_single_A", "tree_single_B", "rock_single_A", "rock_single_B", "rock_single_C"]
+const EDGE_SCATTER_CHANCE := 0.45
+const EDGE_SCATTER_RADIUS := 0.7
+const FOREST := ["trees_A_large", "trees_A_medium", "trees_B_large", "trees_B_medium"]
+const HILLS := ["hills_A_trees", "hills_B_trees", "hills_C_trees", "trees_B_large"]
+const MOUNTAINS := ["mountain_A_grass_trees", "mountain_B_grass_trees", "mountain_C_grass_trees"]
+
+## Hand-placed props. Each entry: [q, r, model, offset (x, z) from tile center, y rotation°].
+const PROPS := [
+	[1, -1, "barrel", Vector2(-2.2, 1.4), 0.0],        # Tavern
+	[1, -1, "barrel", Vector2(-1.6, 2.0), 40.0],
+	[1, -1, "flag_red", Vector2(2.0, 1.8), 0.0],
+	[-1, 0, "crate_A_big", Vector2(2.2, 1.2), 15.0],   # Market
+	[-1, 0, "crate_B_small", Vector2(2.4, 0.2), 60.0],
+	[-1, 0, "sack", Vector2(1.6, 2.0), 0.0],
+	[1, 0, "weaponrack", Vector2(-2.0, -1.0), -60.0],  # Blacksmith
+	[0, 1, "bucket_water", Vector2(1.4, -0.6), 0.0],   # Well
+	[2, -2, "wheelbarrow", Vector2(-2.0, 1.2), 120.0], # Windmill
+	[2, -2, "sack", Vector2(-1.2, 2.0), 0.0],
+	[0, -2, "flag_red", Vector2(-1.8, 0.0), 0.0],      # Road to Blackwood
+	[0, -2, "flag_red", Vector2(1.8, 0.0), 0.0],
+]
+
 
 func _ready() -> void:
 	rotation_degrees.y = ROAD_ALIGN_DEGREES
 	_build_ground()
 	_build_buildings()
+	_build_nature()
+	_build_props()
 	_build_walls()
 
 
@@ -93,13 +125,53 @@ func _build_buildings() -> void:
 		var node := _place(building[2], building[0], building[1])
 		var to_square := -node.position
 		node.rotation.y = atan2(to_square.x, to_square.z)
-		var shape := CollisionShape3D.new()
-		var cylinder := CylinderShape3D.new()
-		cylinder.radius = building[3]
-		cylinder.height = 4.0
-		shape.shape = cylinder
-		shape.position = node.position + Vector3.UP * 2.0
-		body.add_child(shape)
+		_add_cylinder_collider(body, node.position, building[3])
+
+
+func _build_nature() -> void:
+	var body := StaticBody3D.new()
+	body.name = "NatureColliders"
+	add_child(body)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = NATURE_SEED
+	var blocked := {}
+	for road in ROADS:
+		blocked[Vector2i(road[0], road[1])] = true
+	for q in range(-GROUND_RINGS, GROUND_RINGS + 1):
+		for r in range(-GROUND_RINGS, GROUND_RINGS + 1):
+			var ring := hex_distance(q, r)
+			if ring < 3 or ring > GROUND_RINGS or blocked.has(Vector2i(q, r)):
+				continue
+			var spin := rng.randi_range(0, 5) * 60.0
+			match ring:
+				3:
+					if rng.randf() < EDGE_SCATTER_CHANCE:
+						var node := _place(EDGE_SCATTER[rng.randi() % EDGE_SCATTER.size()], q, r, spin)
+						node.position += Vector3(rng.randf_range(-1.5, 1.5), 0.0, rng.randf_range(-1.5, 1.5))
+						_add_cylinder_collider(body, node.position, EDGE_SCATTER_RADIUS)
+				4:
+					_place(FOREST[rng.randi() % FOREST.size()], q, r, spin)
+				5:
+					_place(HILLS[rng.randi() % HILLS.size()], q, r, spin)
+				_:
+					_place(MOUNTAINS[rng.randi() % MOUNTAINS.size()], q, r, spin)
+
+
+func _build_props() -> void:
+	for prop in PROPS:
+		var node := _place(prop[2], prop[0], prop[1], prop[4])
+		node.position += Vector3(prop[3].x, 0.0, prop[3].y)
+		node.scale = Vector3.ONE * PROP_SCALE
+
+
+func _add_cylinder_collider(body: StaticBody3D, at: Vector3, radius: float) -> void:
+	var shape := CollisionShape3D.new()
+	var cylinder := CylinderShape3D.new()
+	cylinder.radius = radius
+	cylinder.height = 4.0
+	shape.shape = cylinder
+	shape.position = at + Vector3.UP * 2.0
+	body.add_child(shape)
 
 
 ## Invisible ring of walls so the hero can't walk off the edge of town.
