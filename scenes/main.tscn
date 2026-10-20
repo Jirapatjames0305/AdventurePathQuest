@@ -7,10 +7,11 @@
 [ext_resource type="Script" path="res://scripts/world/ravenfall_village.gd" id="5_village"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
-sky_top_color = Color(0.4, 0.6, 0.85, 1)
-sky_horizon_color = Color(0.72, 0.79, 0.82, 1)
-ground_bottom_color = Color(0.28, 0.35, 0.26, 1)
-ground_horizon_color = Color(0.72, 0.79, 0.82, 1)
+sky_top_color = Color(0.42, 0.6, 0.86, 1)
+sky_horizon_color = Color(0.96, 0.86, 0.74, 1)
+ground_bottom_color = Color(0.24, 0.32, 0.22, 1)
+ground_horizon_color = Color(0.96, 0.86, 0.74, 1)
+sun_angle_max = 40.0
 
 [sub_resource type="Sky" id="Sky"]
 sky_material = SubResource("SkyMat")
@@ -19,8 +20,21 @@ sky_material = SubResource("SkyMat")
 background_mode = 2
 sky = SubResource("Sky")
 ambient_light_source = 3
-tonemap_mode = 2
+ambient_light_energy = 0.7
+tonemap_mode = 3
+tonemap_exposure = 0.95
 ssao_enabled = true
+ssao_intensity = 2.5
+ssao_power = 1.4
+glow_enabled = true
+glow_intensity = 0.4
+glow_bloom = 0.05
+fog_enabled = true
+fog_light_color = Color(0.95, 0.86, 0.74, 1)
+fog_density = 0.0008
+fog_sky_affect = 0.0
+adjustment_enabled = true
+adjustment_saturation = 1.05
 
 [sub_resource type="BoxShape3D" id="FloorShape"]
 size = Vector3(40, 0.2, 40)
@@ -36,8 +50,10 @@ environment = SubResource("Env")
 
 [node name="Sun" type="DirectionalLight3D" parent="." unique_id=1782111765]
 transform = Transform3D(0.8192, 0.4699, -0.329, 0, 0.5736, 0.8192, 0.5736, -0.6711, 0.4699, 0, 12, 0)
-light_energy = 1.2
+light_color = Color(1, 0.95, 0.86, 1)
+light_energy = 1.4
 shadow_enabled = true
+shadow_blur = 1.5
 
 [node name="Floor" type="StaticBody3D" parent="." unique_id=1953586538]
 

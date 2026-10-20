@@ -17,6 +17,10 @@ const WALL_SEGMENTS := 24
 ## Hex-pack props (barrels, crates…) are modelled at map scale; this makes
 ## them hero-sized.
 const PROP_SCALE := 6.0
+## The pack's grass is quite yellow under warm light; tint ground tiles greener.
+const GRASS_TINT := Color(0.72, 0.95, 0.62)
+## Road tiles get a milder tint so the dirt path keeps its sandy colour.
+const ROAD_TINT := Color(0.9, 0.98, 0.84)
 ## Fixed seed so the scattered nature looks the same every visit.
 const NATURE_SEED := 20261020
 ## Turns the whole town so the Blackwood road points straight up the screen
@@ -103,6 +107,8 @@ func _place(asset: String, q: int, r: int, rotation_deg := 0.0) -> Node3D:
 
 
 func _build_ground() -> void:
+	var grass_material: Material = null
+	var road_material: Material = null
 	var roads := {}
 	for road in ROADS:
 		roads[Vector2i(road[0], road[1])] = road
@@ -111,10 +117,14 @@ func _build_ground() -> void:
 			if hex_distance(q, r) > GROUND_RINGS:
 				continue
 			var road: Array = roads.get(Vector2i(q, r), [])
-			if road.is_empty():
-				_place("hex_grass", q, r)
-			else:
-				_place(road[2], q, r, road[3])
+			var tile := _place("hex_grass", q, r) if road.is_empty() else _place(road[2], q, r, road[3])
+			var mesh: MeshInstance3D = tile.find_children("*", "MeshInstance3D")[0]
+			if not grass_material:
+				grass_material = mesh.mesh.surface_get_material(0).duplicate()
+				grass_material.albedo_color = GRASS_TINT
+				road_material = grass_material.duplicate()
+				road_material.albedo_color = ROAD_TINT
+			mesh.material_override = grass_material if road.is_empty() else road_material
 
 
 func _build_buildings() -> void:
