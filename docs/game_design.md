@@ -11,6 +11,35 @@ This file will hold detailed game design notes as they evolve beyond the roadmap
 
 ---
 
+## Ravenfall city spec
+
+Broken down from the art prompt ([`reference/ravenfall_prompt.md`](reference/ravenfall_prompt.md)).
+Built by `scripts/world/ravenfall_village.gd` (layout) + `scripts/world/town_decor.gd` (procedural decor).
+
+| Prompt requirement | In game |
+|---|---|
+| Ancient stone walls, main entrance gate | Hex wall ring 6 with blue-cone towers at the corners and 2 big towers flanking the gate |
+| Rolling green hills, dense forests | Terrain flat inside the walls, rising into hills ~11 units high beyond radius 46; forest grows in noise patches with open meadows |
+| Winding road into the wilderness | Catmull-Rom dirt road from the gate, over the river bridge, curving up into the hills |
+| Large central stone plaza + ancient fountain | Paved round plaza r=7.5; procedural 2-tier stone fountain with water spray |
+| Grand town hall | Castle at the north end of the main street (civic district) |
+| Blacksmith with glowing forge | North-west crafts district; flickering orange light + embers |
+| Cozy tavern | West district, lanterns + barrels out front (Rest) |
+| General goods shop / potion shop | Market building (general goods) and mage tower (potion shop) on the plaza edge |
+| Small marketplace, colourful stalls | 6 tinted tents (red/blue/yellow/green/pink/orange) around the fountain with goods |
+| Church with tall bell tower | North-east church district, fenced flower garden |
+| Timber-frame cottages | East + west residential districts |
+| Flower gardens | 11 procedural flower beds (MultiMesh blooms on soil) |
+| Stone pathways, interconnected streets | Paved main street + stone paths from the plaza to every district |
+| Wooden fences | Church garden, west cottages, around the wheat fields |
+| Warm lanterns | 15 wooden lantern posts with real warm lights along the street, plaza, tavern |
+| Subtle magical atmosphere | Faint golden motes drifting over the town |
+| Soft AO, warm natural light | SSAO + low golden sun (see V5) |
+
+**Not possible with current packs (later):** tavern balconies, detailed stone/wood textures, waterfall.
+
+---
+
 ## Visual Design Roadmap
 
 The game is moving from grey boxes to the "Cute Fantasy" look in README §2,
@@ -44,6 +73,7 @@ Each step has a **goal**, a **change**, and a **done check**. ⬜ = not started,
 | ✅ V5 (2026-10-20) | **Light & mood** | Warm sun with soft shadows, a sky with a warm horizon, ACES tonemap, light fog, faint glow, stronger SSAO. Ground tiles are tinted greener (`GRASS_TINT`), and road tiles get a milder tint so the path keeps its sandy colour (the pack's grass turns yellow under warm light) | Before/after screenshots compared side by side |
 | ✅ V5b (2026-10-20) | **Ravenfall big town (from reference)** | Rebuilt the town to match the reference image: hex wall ring 6 (corners + gate + 5 blue-cone towers), paved plaza with a well in the middle and market stalls, paved main street from the gate up to the manor (castle), blue-roof buildings ×1.5 (cathedral, tavern, blacksmith, market, mage tower, barracks, 20 homes), a garden pond, a river and road bridge outside the gate, wheat fields and a windmill top-right, then forest and hills out to ring 10. Low golden-hour sun with long shadows; camera size 18 | Overview and gameplay screenshots look close to the reference |
 | ✅ V5c (2026-10-20) | **Smooth ground (no hex tiles)** | Per user feedback: dropped the hex ground tiles. The ground is now one large terrain with two-tone noise. The plaza is a round stone disc, the main street a paved strip, the outer road a dirt strip; the river is a water strip with sandy banks and a real bridge model; the pond is an oval; the fields are rectangles. Hills with hex bases were replaced by forest. Hex coords are still used as the placement grid | No hex shapes visible on the ground |
+| ✅ V5d (2026-10-20) | **Ravenfall city spec from the art prompt** | Rebuilt the town from the prompt breakdown (table above): districts, fountain, colourful stalls, lanterns, flower beds, fences, forge glow, magic motes, stone paths, winding road, rolling hills | Every prompt item maps to something visible in the game |
 | ⬜ V6 | **UI theme** | One project-wide Godot Theme: rounded font (Fredoka, OFL), parchment-coloured panels, wood/gold buttons. This changes every screen at once without touching layouts | Screenshots of Ravenfall, Blackwood and Combat with the theme |
 | ⬜ V7 | **Walk-up interaction** *(optional)* | Walking to a building opens its shop. The bottom buttons stay as a shortcut | Walk to the blacksmith and the shop opens |
 | ⬜ V8 | **Blackwood map look** | Pick the enemy model source, then turn the enemy list into a forest map with nodes (ties into Phase 3 maps) | Screenshot of the Blackwood map |

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bg7prl16264ri"
-path="res://.godot/imported/building_well_blue.gltf-022d1846086b1e6b4fb0d19f059a3330.scn"
+uid="uid://7ivcb4fujv8m"
+path="res://.godot/imported/fence_wood_straight.gltf-483c4e0132eb0e4805c9fa0fda853521.scn"
 
 [deps]
 
-source_file="res://assets/environments/kaykit_medieval/building_well_blue.gltf"
-dest_files=["res://.godot/imported/building_well_blue.gltf-022d1846086b1e6b4fb0d19f059a3330.scn"]
+source_file="res://assets/environments/kaykit_medieval/fence_wood_straight.gltf"
+dest_files=["res://.godot/imported/fence_wood_straight.gltf-483c4e0132eb0e4805c9fa0fda853521.scn"]
 
 [params]
 

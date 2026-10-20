@@ -15,7 +15,7 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "building_well_blue"
+            "name" : "fence_wood_straight"
         }
     ],
     "materials" : [
@@ -32,7 +32,7 @@
     ],
     "meshes" : [
         {
-            "name" : "building_well_blue",
+            "name" : "fence_wood_straight",
             "primitives" : [
                 {
                     "attributes" : {
@@ -63,61 +63,61 @@
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 1187,
+            "count" : 430,
             "max" : [
-                0.3368363678455353,
-                0.8260108828544617,
-                0.3753618001937866
+                -0.9499995708465576,
+                0.5,
+                0.5773504376411438
             ],
             "min" : [
-                -0.31495729088783264,
-                -1.611560833225667e-06,
-                -0.3753618001937866
+                -1.0499995946884155,
+                -0.05001270771026611,
+                -0.5773505568504333
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 1187,
+            "count" : 430,
             "type" : "VEC2"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 1187,
+            "count" : 430,
             "type" : "VEC3"
         },
         {
             "bufferView" : 3,
             "componentType" : 5123,
-            "count" : 2178,
+            "count" : 636,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 14244,
+            "byteLength" : 5160,
             "byteOffset" : 0,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 9496,
-            "byteOffset" : 14244,
+            "byteLength" : 3440,
+            "byteOffset" : 5160,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 14244,
-            "byteOffset" : 23740,
+            "byteLength" : 5160,
+            "byteOffset" : 8600,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 4356,
-            "byteOffset" : 37984,
+            "byteLength" : 1272,
+            "byteOffset" : 13760,
             "target" : 34963
         }
     ],
@@ -129,8 +129,8 @@
     ],
     "buffers" : [
         {
-            "byteLength" : 42340,
-            "uri" : "building_well_blue.bin"
+            "byteLength" : 15032,
+            "uri" : "fence_wood_straight.bin"
         }
     ]
 }
