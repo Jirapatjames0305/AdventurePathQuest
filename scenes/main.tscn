@@ -79,7 +79,7 @@ shape = SubResource("FloorShape")
 script = ExtResource("5_square")
 
 [node name="GuildHall" type="Node3D" parent="."]
-transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -34.93, 0, -18.81)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -34.93, 0, -18.81)
 script = ExtResource("6_guild")
 
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1249246146]
