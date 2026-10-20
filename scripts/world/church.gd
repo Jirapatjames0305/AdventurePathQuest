@@ -74,6 +74,12 @@ func _build_tower(half: Vector3) -> void:
 	arch.rotation.x = PI / 2.0
 	arch.position = Vector3(0, base + 3.0, front + 0.05)
 	_box(Vector3(0.06, 2.9, 0.18), "gold", Vector3(0, base + 1.45, front + 0.1))
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 31
+	for x in [-2.6, 2.6]:
+		DecorProps.potted_plant(self, Vector3(x, 0, front + 0.9), rng, 1.2)
+	for x in [-1.5, 1.5]:
+		DecorProps.wall_lantern(self, Vector3(x, base + 3.2, front), Vector3(0, 0, 1))
 	# Rose window.
 	var rose := _cylinder(0.95, 0.95, 0.1, "glass0", Vector3.ZERO, 16)
 	rose.rotation.x = PI / 2.0
@@ -126,9 +132,22 @@ func _add_collision(half: Vector3) -> void:
 	add_child(body)
 
 
-func _material(key: String) -> StandardMaterial3D:
+## Roof / plaster / stone / timber surfaces get the shared detailed shader.
+func _detailed(key: String) -> Material:
+	match key:
+		"stone": return BuildingMaterials.stone(STONE)
+		"stone_dark": return BuildingMaterials.stone(STONE_DARK)
+		"roof": return BuildingMaterials.roof(ROOF)
+	return null
+
+
+func _material(key: String) -> Material:
 	if _materials.has(key):
 		return _materials[key]
+	var detailed := _detailed(key)
+	if detailed:
+		_materials[key] = detailed
+		return detailed
 	var material := StandardMaterial3D.new()
 	material.roughness = 0.85
 	match key:

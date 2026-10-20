@@ -39,6 +39,10 @@ func _ready() -> void:
 	_build_towers(base)
 	_build_portico(base)
 	_build_quest_board(Vector3(5.2, base, PLINTH.z / 2.0 + 1.0))
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 21
+	for x in [-3.8, 3.8]:
+		DecorProps.potted_plant(self, Vector3(x, 0, PLINTH.z / 2.0 + 2.1), rng, 1.3)
 	_add_collision()
 
 
@@ -147,9 +151,22 @@ func _add_collision() -> void:
 	add_child(body)
 
 
-func _material(key: String) -> StandardMaterial3D:
+## Roof / plaster / stone / timber surfaces get the shared detailed shader.
+func _detailed(key: String) -> Material:
+	match key:
+		"stone": return BuildingMaterials.stone(STONE)
+		"stone_dark": return BuildingMaterials.stone(STONE_DARK)
+		"roof": return BuildingMaterials.roof(ROOF)
+	return null
+
+
+func _material(key: String) -> Material:
 	if _materials.has(key):
 		return _materials[key]
+	var detailed := _detailed(key)
+	if detailed:
+		_materials[key] = detailed
+		return detailed
 	var material := StandardMaterial3D.new()
 	material.roughness = 0.85
 	match key:

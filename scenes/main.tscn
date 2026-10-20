@@ -18,6 +18,7 @@
 [ext_resource type="Script" path="res://scripts/world/park.gd" id="16_park"]
 [ext_resource type="Script" path="res://scripts/world/town_wall.gd" id="17_wall"]
 [ext_resource type="Script" path="res://scripts/world/town_trees.gd" id="18_trees"]
+[ext_resource type="Script" path="res://scripts/world/building_planting.gd" id="19_planting"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.5, 0.6, 0.8, 1)
@@ -89,7 +90,7 @@ shape = SubResource("FloorShape")
 [node name="TownSquare" type="Node3D" parent="."]
 script = ExtResource("5_square")
 
-[node name="GuildHall" type="Node3D" parent="." groups=["fade_occluder"]]
+[node name="GuildHall" type="Node3D" parent="." groups=["fade_occluder", "house"]]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -34.93, 0, -18.81)
 script = ExtResource("6_guild")
 
@@ -97,7 +98,7 @@ script = ExtResource("6_guild")
 script = ExtResource("8_path")
 corners = PackedVector3Array(-26.53, 0, -18.81, -13.0, 0, -18.81, -13.0, 0, -16.0)
 
-[node name="Cottage" type="Node3D" parent="." groups=["fade_occluder"]]
+[node name="Cottage" type="Node3D" parent="." groups=["fade_occluder", "house"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, -30)
 script = ExtResource("9_cottage")
 
@@ -106,7 +107,7 @@ script = ExtResource("8_path")
 corners = PackedVector3Array(-18, 0, -27.0, -18, 0, -20.6)
 width = 2.6
 
-[node name="Church" type="Node3D" parent="." groups=["fade_occluder"]]
+[node name="Church" type="Node3D" parent="." groups=["fade_occluder", "house"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -36)
 script = ExtResource("10_church")
 
@@ -114,7 +115,7 @@ script = ExtResource("10_church")
 script = ExtResource("8_path")
 corners = PackedVector3Array(-2, 0, -22.6, -2, 0, -16.0)
 
-[node name="Blacksmith" type="Node3D" parent="." groups=["fade_occluder"]]
+[node name="Blacksmith" type="Node3D" parent="." groups=["fade_occluder", "house"]]
 transform = Transform3D(0, 0, 0.55, 0, 0.55, 0, -0.55, 0, 0, -42.2, 0, 0)
 script = ExtResource("11_smith")
 
@@ -122,19 +123,19 @@ script = ExtResource("11_smith")
 script = ExtResource("8_path")
 corners = PackedVector3Array(-37.8, 0, 0, -16.0, 0, 0)
 
-[node name="RowHouse1" type="Node3D" parent="." groups=["fade_occluder"]]
+[node name="RowHouse1" type="Node3D" parent="." groups=["fade_occluder", "house"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.17, 0, 15.41)
 script = ExtResource("9_cottage")
 wall_color = Color(0.93, 0.88, 0.76, 1)
 roof_color = Color(0.62, 0.3, 0.22, 1)
 
-[node name="RowHouse2" type="Node3D" parent="." groups=["fade_occluder"]]
+[node name="RowHouse2" type="Node3D" parent="." groups=["fade_occluder", "house"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.57, 0, 15.41)
 script = ExtResource("9_cottage")
 wall_color = Color(0.95, 0.9, 0.82, 1)
 roof_color = Color(0.3, 0.42, 0.6, 1)
 
-[node name="RowHouse3" type="Node3D" parent="." groups=["fade_occluder"]]
+[node name="RowHouse3" type="Node3D" parent="." groups=["fade_occluder", "house"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.97, 0, 15.41)
 script = ExtResource("9_cottage")
 wall_color = Color(0.9, 0.84, 0.72, 1)
@@ -144,7 +145,7 @@ roof_color = Color(0.35, 0.5, 0.32, 1)
 script = ExtResource("8_path")
 corners = PackedVector3Array(-40.07, 0, 21.01, -14.0, 0, 21.01, -14.0, 0, 16.0)
 
-[node name="Tavern" type="Node3D" parent="." groups=["fade_occluder"]]
+[node name="Tavern" type="Node3D" parent="." groups=["fade_occluder", "house"]]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -28.57, 0, 42.0)
 script = ExtResource("12_tavern")
 
@@ -152,7 +153,7 @@ script = ExtResource("12_tavern")
 script = ExtResource("8_path")
 corners = PackedVector3Array(-23.4, 0, 42.0, -14.0, 0, 42.0, -14.0, 0, 23.0)
 
-[node name="GeneralStore" type="Node3D" parent="." groups=["fade_occluder"]]
+[node name="GeneralStore" type="Node3D" parent="." groups=["fade_occluder", "house"]]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -6.9, 0, 42)
 script = ExtResource("13_store")
 
@@ -160,7 +161,7 @@ script = ExtResource("13_store")
 script = ExtResource("8_path")
 corners = PackedVector3Array(3.2, 0, 48.0, 3.2, 0, 16.0)
 
-[node name="MagicShop" type="Node3D" parent="." groups=["fade_occluder"]]
+[node name="MagicShop" type="Node3D" parent="." groups=["fade_occluder", "house"]]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 12.0, 0, 42)
 script = ExtResource("14_magic")
 
@@ -180,6 +181,9 @@ width = 5.0
 
 [node name="TownWall" type="Node3D" parent="."]
 script = ExtResource("17_wall")
+
+[node name="BuildingPlanting" type="Node3D" parent="."]
+script = ExtResource("19_planting")
 
 [node name="TownTrees" type="Node3D" parent="."]
 script = ExtResource("18_trees")

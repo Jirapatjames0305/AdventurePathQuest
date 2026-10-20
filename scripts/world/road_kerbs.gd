@@ -10,7 +10,7 @@ extends RefCounted
 
 const BLOCK := Vector3(0.42, 0.18, 0.85)
 const GAP := 0.06
-const COLORS := [Color(0.6, 0.58, 0.55), Color(0.55, 0.53, 0.5), Color(0.64, 0.62, 0.58), Color(0.5, 0.48, 0.46)]
+const COLORS := [Color(0.72, 0.7, 0.66), Color(0.66, 0.64, 0.6), Color(0.77, 0.75, 0.7), Color(0.61, 0.59, 0.56)]
 
 
 ## True if `point` (world space) is on any road or paved area other than `exclude`.
@@ -51,6 +51,7 @@ static func make_instance(blocks: Array[Transform3D], seed: int) -> MultiMeshIns
 	box.size = BLOCK
 	var material := StandardMaterial3D.new()
 	material.vertex_color_use_as_albedo = true
+	material.vertex_color_is_srgb = true
 	material.roughness = 0.9
 	box.material = material
 	var multimesh := MultiMesh.new()

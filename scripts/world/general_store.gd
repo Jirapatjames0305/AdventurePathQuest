@@ -71,6 +71,9 @@ func _shop_front(rng: RandomNumberGenerator) -> void:
 	_box(Vector3(2.0, 2.6, 0.15), "beam", Vector3(0, 0.3 + 1.3, front + 0.03))
 	_box(Vector3(0.08, 0.08, 0.08), "gold", Vector3(0.6, 0.3 + 1.3, front + 0.12))
 	_box(Vector3(2.8, 0.25, 1.0), "stone", Vector3(0, 0.12, front + 0.5))
+	for x in [-1.75, 1.75]:
+		DecorProps.potted_plant(self, Vector3(x, 0, front + 0.6), rng)
+		DecorProps.wall_lantern(self, Vector3(x * 0.8, 0.3 + 2.5, front), Vector3(0, 0, 1))
 	for x in [-3.8, 3.8]:
 		_window(Vector3(x, 0.3 + 1.6, front), Vector3(0, 0, 1), Vector2(3.4, 1.8))
 		# Goods on a shelf behind the glass.
@@ -151,9 +154,23 @@ func _add_collision() -> void:
 	add_child(body)
 
 
-func _material(key: String) -> StandardMaterial3D:
+## Roof / plaster / stone / timber surfaces get the shared detailed shader.
+func _detailed(key: String) -> Material:
+	match key:
+		"stone": return BuildingMaterials.stone(STONE)
+		"wall": return BuildingMaterials.plaster(WALL)
+		"beam": return BuildingMaterials.timber(BEAM)
+		"roof": return BuildingMaterials.roof(ROOF)
+	return null
+
+
+func _material(key: String) -> Material:
 	if _materials.has(key):
 		return _materials[key]
+	var detailed := _detailed(key)
+	if detailed:
+		_materials[key] = detailed
+		return detailed
 	var material := StandardMaterial3D.new()
 	material.roughness = 0.85
 	if key.begins_with("goods"):

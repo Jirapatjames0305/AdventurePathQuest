@@ -24,7 +24,7 @@ func _ready() -> void:
 
 
 func _scatter() -> void:
-	var footprints := _building_footprints()
+	var footprints := building_footprints(get_tree(), BUILDING_CLEARANCE)
 	var parks := get_tree().get_nodes_in_group("park")
 	var area := TownWall.BOUNDS.grow(-WALL_INSET)
 	var body := StaticBody3D.new()
@@ -56,16 +56,16 @@ func _scatter() -> void:
 		factory.random_tree(self, body, at, _rng)
 
 
-## Ground rectangles (x/z) of every building and wall piece, grown by the clearance.
-func _building_footprints() -> Array[Rect2]:
+## Ground rectangles (x/z) of every building and wall piece, grown by `clearance`.
+static func building_footprints(tree: SceneTree, clearance: float) -> Array[Rect2]:
 	var rects: Array[Rect2] = []
-	for node in get_tree().get_nodes_in_group("fade_occluder"):
+	for node in tree.get_nodes_in_group("fade_occluder"):
 		var bounds := AABB()
 		for mesh in node.find_children("*", "MeshInstance3D", true, false):
 			var box: AABB = mesh.global_transform * mesh.get_aabb()
 			bounds = box if bounds.size == Vector3.ZERO else bounds.merge(box)
 		if bounds.size != Vector3.ZERO:
-			rects.append(Rect2(bounds.position.x, bounds.position.z, bounds.size.x, bounds.size.z).grow(BUILDING_CLEARANCE))
+			rects.append(Rect2(bounds.position.x, bounds.position.z, bounds.size.x, bounds.size.z).grow(clearance))
 	return rects
 
 

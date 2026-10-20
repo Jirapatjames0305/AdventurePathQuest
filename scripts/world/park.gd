@@ -202,6 +202,7 @@ func _flower_bed(at: Vector3, size: Vector2) -> void:
 	bloom.rings = 3
 	var material := StandardMaterial3D.new()
 	material.vertex_color_use_as_albedo = true
+	material.vertex_color_is_srgb = true
 	bloom.material = material
 	var multimesh := MultiMesh.new()
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D

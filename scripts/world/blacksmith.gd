@@ -42,6 +42,7 @@ func _ready() -> void:
 	# Big double doors into the workshop.
 	_box(Vector3(2.6, 2.8, 0.15), "beam", Vector3(2.2, 0.3 + 1.4, half.z + 0.02))
 	_box(Vector3(0.08, 2.7, 0.18), "iron", Vector3(2.2, 0.3 + 1.4, half.z + 0.08))
+	DecorProps.wall_lantern(self, Vector3(4.0, 0.3 + 2.6, half.z), Vector3(0, 0, 1))
 	_build_yard(half)
 	_add_collision(half)
 
@@ -182,9 +183,24 @@ func _add_collision(half: Vector3) -> void:
 	add_child(body)
 
 
-func _material(key: String) -> StandardMaterial3D:
+## Roof / plaster / stone / timber surfaces get the shared detailed shader.
+func _detailed(key: String) -> Material:
+	match key:
+		"stone": return BuildingMaterials.stone(STONE)
+		"stone_dark": return BuildingMaterials.stone(STONE_DARK)
+		"wall": return BuildingMaterials.plaster(WALL)
+		"beam": return BuildingMaterials.timber(BEAM)
+		"roof": return BuildingMaterials.roof(ROOF)
+	return null
+
+
+func _material(key: String) -> Material:
 	if _materials.has(key):
 		return _materials[key]
+	var detailed := _detailed(key)
+	if detailed:
+		_materials[key] = detailed
+		return detailed
 	var material := StandardMaterial3D.new()
 	material.roughness = 0.85
 	match key:

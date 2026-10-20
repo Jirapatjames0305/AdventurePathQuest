@@ -25,20 +25,24 @@ var _materials := {}
 
 func _ready() -> void:
 	var half := SIZE / 2.0
-	_box(Vector3(SIZE.x + 0.2, FOOTING, SIZE.z + 0.2), _flat(STONE), Vector3(0, FOOTING / 2.0, 0))
-	_box(SIZE, _flat(wall_color), Vector3(0, FOOTING + half.y, 0))
+	_box(Vector3(SIZE.x + 0.2, FOOTING, SIZE.z + 0.2), BuildingMaterials.stone(STONE), Vector3(0, FOOTING / 2.0, 0))
+	_box(SIZE, BuildingMaterials.plaster(wall_color), Vector3(0, FOOTING + half.y, 0))
 	_build_beams(half)
 	# Gabled roof: ridge runs left–right, so the gable ends face the sides.
 	var roof := PrismMesh.new()
 	roof.size = Vector3(SIZE.z + ROOF_OVERHANG * 2.0, ROOF_HEIGHT, SIZE.x + ROOF_OVERHANG * 2.0)
-	var roof_node := _mesh(roof, _flat(roof_color), Vector3(0, FOOTING + SIZE.y + ROOF_HEIGHT / 2.0, 0))
+	var roof_node := _mesh(roof, BuildingMaterials.roof(roof_color), Vector3(0, FOOTING + SIZE.y + ROOF_HEIGHT / 2.0, 0))
 	roof_node.rotation.y = PI / 2.0
-	_box(Vector3(0.8, 2.6, 0.8), _flat(STONE), Vector3(half.x - 1.1, FOOTING + SIZE.y + 1.4, -0.9))
+	# Ridge cap along the top of the roof.
+	_box(Vector3(SIZE.x + ROOF_OVERHANG * 2.0 + 0.1, 0.2, 0.34), BuildingMaterials.roof(roof_color.darkened(0.3)), Vector3(0, FOOTING + SIZE.y + ROOF_HEIGHT - 0.02, 0))
+	_box(Vector3(0.8, 2.6, 0.8), BuildingMaterials.stone(STONE), Vector3(half.x - 1.1, FOOTING + SIZE.y + 1.4, -0.9))
 	# Front: door, two windows, flower box, step.
 	_box(Vector3(1.1, 2.0, 0.12), _flat(BEAM), Vector3(0, FOOTING + 1.0, half.z + 0.02))
 	_box(Vector3(0.08, 0.08, 0.06), _flat(Color(0.9, 0.75, 0.35)), Vector3(0.35, FOOTING + 1.0, half.z + 0.1))
+	DecorProps.wall_lantern(self, Vector3(0, FOOTING + 2.45, half.z), Vector3(0, 0, 1))
 	for x in [-1.9, 1.9]:
 		_window(Vector3(x, FOOTING + 1.7, half.z))
+		_shutters(Vector3(x, FOOTING + 1.7, half.z), Vector3(0, 0, 1))
 		_box(Vector3(1.2, 0.25, 0.35), _flat(BEAM), Vector3(x, FOOTING + 1.05, half.z + 0.18))
 		for n in 5:
 			var bloom := SphereMesh.new()
@@ -49,6 +53,7 @@ func _ready() -> void:
 	# Side windows.
 	for side in [-1.0, 1.0]:
 		_window(Vector3(side * half.x, FOOTING + 1.7, 0), Vector3(side, 0, 0))
+		_shutters(Vector3(side * half.x, FOOTING + 1.7, 0), Vector3(side, 0, 0))
 
 	var body := StaticBody3D.new()
 	var shape := CollisionShape3D.new()
@@ -62,7 +67,7 @@ func _ready() -> void:
 
 ## Dark timber frame: corner posts, a mid rail and a top plate on every side.
 func _build_beams(half: Vector3) -> void:
-	var beam := _flat(BEAM)
+	var beam := BuildingMaterials.timber(BEAM)
 	var top := FOOTING + SIZE.y
 	for x in [-half.x, half.x]:
 		for z in [-half.z, half.z]:
@@ -88,6 +93,18 @@ func _window(at: Vector3, facing := Vector3(0, 0, 1)) -> MeshInstance3D:
 	var pane := _box(Vector3(0.85, 0.75, 0.1), glow, at + facing * 0.04)
 	pane.rotation.y = frame.rotation.y
 	return pane
+
+
+## A pair of plank shutters (in a darker shade of the roof colour) beside a window.
+func _shutters(at: Vector3, facing: Vector3) -> void:
+	var right := Vector3(facing.z, 0, -facing.x)
+	var yaw := atan2(facing.x, facing.z)
+	var wood := BuildingMaterials.timber(roof_color.darkened(0.35))
+	for side in [-1.0, 1.0]:
+		var board := _box(Vector3(0.42, 1.05, 0.06), wood, at + right * side * 0.78 + facing * 0.06)
+		board.rotation.y = yaw
+		var rail := _box(Vector3(0.44, 0.07, 0.08), _flat(BEAM), at + right * side * 0.78 + facing * 0.08 + Vector3.UP * 0.25)
+		rail.rotation.y = yaw
 
 
 func _flat(color: Color) -> StandardMaterial3D:
