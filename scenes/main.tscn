@@ -21,6 +21,7 @@
 [ext_resource type="Script" path="res://scripts/world/building_planting.gd" id="19_planting"]
 [ext_resource type="Script" path="res://scripts/ui/minimap.gd" id="20_minimap"]
 [ext_resource type="Script" path="res://scripts/ui/compass_rose.gd" id="21_compass"]
+[ext_resource type="Script" path="res://scripts/world/plaza_npcs.gd" id="22_npcs"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.5, 0.6, 0.8, 1)
@@ -190,8 +191,11 @@ script = ExtResource("19_planting")
 [node name="TownTrees" type="Node3D" parent="."]
 script = ExtResource("18_trees")
 
+[node name="PlazaNPCs" type="Node3D" parent="."]
+script = ExtResource("22_npcs")
+
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1249246146]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 1, 3.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 1, 0)
 script = ExtResource("1_player")
 
 [node name="Model" type="Node3D" parent="Player"]

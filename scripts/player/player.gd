@@ -11,6 +11,10 @@ const CAMERA_YAW_DEGREES := 45.0
 @onready var model: CharacterModel = $Model
 
 
+func _ready() -> void:
+	add_to_group("player")
+
+
 func _enter_tree() -> void:
 	# Set before Model's _ready so it loads the chosen hero only once.
 	$Model.character_id = GameManager.player_data.character_id

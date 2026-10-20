@@ -1,7 +1,7 @@
 extends Node3D
 ## Isometric camera rig — fixed angle, smoothly follows a target.
 ## Zoom with the on-screen +/- buttons, the mouse wheel, or the +/- keys.
-## Starts fully zoomed out.
+## Starts fully zoomed in.
 
 @export var target_path: NodePath
 @export var follow_speed := 5.0
@@ -23,8 +23,8 @@ func _ready() -> void:
 		_target = get_node_or_null(target_path)
 	if _target:
 		global_position = _target.global_position
-	_zoom_target = zoom_max
-	camera.size = zoom_max
+	_zoom_target = zoom_min
+	camera.size = zoom_min
 	# Orthographic: distance doesn't change the view, but the camera must sit
 	# far enough back that the ground at the bottom of a zoomed-out view isn't
 	# behind it (clipped).
