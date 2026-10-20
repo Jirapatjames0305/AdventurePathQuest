@@ -1,13 +1,13 @@
 extends Control
-## Round minimap (top-left) that follows the hero. Rotated to match the
+## Round minimap (top-left) showing the whole walled town. Rotated to match the
 ## isometric camera (up on the map = up on screen) and drawn from the live
 ## scene: town wall + gate, roads, plaza + fountain, park pond, every building
-## in the "house" group (shops coloured and labelled). The hero is the arrow
-## in the middle. A gold ring frames it with a small north marker.
+## in the "house" group (shops coloured and labelled). The hero is an arrow
+## moving over the map. A gold ring frames it with a small north marker.
 
 const DIAMETER := 230.0
-## World metres from the centre to the edge of the map.
-const VIEW_RADIUS := 55.0
+## Empty space (pixels) between the town's corners and the gold ring.
+const FIT_MARGIN := 14.0
 ## World→screen axes for the isometric camera (yaw 45°).
 const SCREEN_RIGHT := Vector2(0.70710678, -0.70710678)
 const SCREEN_DOWN := Vector2(0.70710678, 0.70710678)
@@ -38,7 +38,9 @@ const SHOPS := {
 @export var player_path: NodePath
 
 var _player: Node3D
-var _scale := DIAMETER / 2.0 / VIEW_RADIUS
+var _scale := 1.0
+## Map-space point shown at the centre of the disc (the town's centre).
+var _focus := Vector2.ZERO
 var _map: Control
 ## Map geometry in metres along the screen axes.
 var _wall := PackedVector2Array()
@@ -93,6 +95,12 @@ func _collect() -> void:
 	for c in [Vector3(bounds.position.x, 0, bounds.position.y), Vector3(bounds.end.x, 0, bounds.position.y),
 			Vector3(bounds.end.x, 0, bounds.end.y), Vector3(bounds.position.x, 0, bounds.end.y)]:
 		_wall.append(_uv(c))
+	# Fit the whole town inside the disc.
+	_focus = _uv(Vector3(bounds.get_center().x, 0, bounds.get_center().y))
+	var reach := 0.0
+	for corner in _wall:
+		reach = maxf(reach, corner.distance_to(_focus))
+	_scale = (DIAMETER / 2.0 - FIT_MARGIN) / reach
 	for gate in TownWall.GATES:
 		match gate[0]:
 			"x+": _gates.append(_uv(Vector3(bounds.end.x, 0, gate[1])))
@@ -138,13 +146,12 @@ func _local_bounds(house: Node3D) -> AABB:
 	return bounds
 
 
-## Map contents, centred on the hero (drawn in metres via a canvas transform).
+## Map contents, centred on the town (drawn in metres via a canvas transform).
 func _draw_map() -> void:
-	if not _ready_to_draw or not _player:
+	if not _ready_to_draw:
 		return
 	var center := size / 2.0
-	var hero := _uv(_player.global_position)
-	_map.draw_set_transform(center - hero * _scale, 0.0, Vector2.ONE * _scale)
+	_map.draw_set_transform(center - _focus * _scale, 0.0, Vector2.ONE * _scale)
 	_map.draw_colored_polygon(_wall, GRASS)
 	for square in _squares:
 		_map.draw_colored_polygon(square, SQUARE)
@@ -170,12 +177,12 @@ func _draw_map() -> void:
 	for building in _buildings:
 		if building.label == "":
 			continue
-		var at: Vector2 = center + (building.center - hero) * _scale
-		if at.distance_to(center) < DIAMETER / 2.0 - 18.0:
-			_label(font, building.label, at)
+		_label(font, building.label, center + (building.center - _focus) * _scale)
+	if _player:
+		_draw_player(_map, center + (_uv(_player.global_position) - _focus) * _scale)
 
 
-## Gold ring, north tab and the hero arrow (drawn above the clipped map).
+## Gold ring and north tab (drawn above the clipped map).
 func _draw_frame(frame: Control) -> void:
 	var center := size / 2.0
 	var radius := DIAMETER / 2.0
@@ -188,8 +195,6 @@ func _draw_frame(frame: Control) -> void:
 	var font := get_theme_default_font()
 	var text_size := font.get_string_size("N", HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
 	frame.draw_string(font, tab + Vector2(-text_size.x / 2.0, 5.0), "N", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color.WHITE)
-	_draw_player(frame, center)
-	frame.queue_redraw()
 
 
 ## Arrow pointing the way the hero faces.
@@ -200,15 +205,15 @@ func _draw_player(canvas: Control, at: Vector2) -> void:
 	var ahead := _uv(Vector3(sin(yaw), 0, cos(yaw)))
 	ahead = ahead.normalized() if ahead.length() > 0.001 else Vector2.UP
 	var side := Vector2(-ahead.y, ahead.x)
-	var arrow := PackedVector2Array([at + ahead * 11.0, at - ahead * 6.0 + side * 7.5, at - ahead * 2.5, at - ahead * 6.0 - side * 7.5])
-	canvas.draw_circle(at, 12.0, Color(0, 0, 0, 0.3))
+	var arrow := PackedVector2Array([at + ahead * 9.0, at - ahead * 5.0 + side * 6.0, at - ahead * 2.0, at - ahead * 5.0 - side * 6.0])
+	canvas.draw_circle(at, 10.0, Color(0, 0, 0, 0.3))
 	canvas.draw_colored_polygon(arrow, PLAYER)
 	arrow.append(arrow[0])
 	canvas.draw_polyline(arrow, Color(0.15, 0.1, 0.05), 1.6, true)
 
 
 func _label(font: Font, text: String, at: Vector2) -> void:
-	var font_size := 13
+	var font_size := 11
 	var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
 	var pos := at + Vector2(-width / 2.0, font_size * 0.35)
 	_map.draw_string_outline(font, pos, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, 4, Color(0.1, 0.08, 0.05, 0.9))
