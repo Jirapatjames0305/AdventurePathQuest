@@ -180,7 +180,7 @@ func _build_prompt() -> void:
 	_prompt.anchor_bottom = 1.0
 	_prompt.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_prompt.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_prompt.offset_bottom = -110
+	_prompt.offset_bottom = -124
 	_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_prompt)
 	var row := HBoxContainer.new()

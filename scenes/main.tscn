@@ -23,6 +23,7 @@
 [ext_resource type="Script" path="res://scripts/ui/compass_rose.gd" id="21_compass"]
 [ext_resource type="Script" path="res://scripts/world/plaza_npcs.gd" id="22_npcs"]
 [ext_resource type="Script" path="res://scripts/ui/npc_interaction.gd" id="23_talk"]
+[ext_resource type="Script" path="res://scripts/ui/nav_bar.gd" id="24_nav"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.5, 0.6, 0.8, 1)
@@ -217,14 +218,14 @@ size = 18.0
 far = 120.0
 
 [node name="RavenfallUI" type="CanvasLayer" parent="."]
-visible = false
 script = ExtResource("3_ui")
 
 [node name="StatsPanel" type="PanelContainer" parent="RavenfallUI"]
+visible = false
 offset_left = 24.0
-offset_top = 24.0
+offset_top = 268.0
 offset_right = 280.0
-offset_bottom = 200.0
+offset_bottom = 444.0
 
 [node name="StatsMargin" type="MarginContainer" parent="RavenfallUI/StatsPanel"]
 layout_mode = 2
@@ -240,19 +241,21 @@ theme_override_font_sizes/font_size = 20
 text = "stats"
 
 [node name="TownTitle" type="Label" parent="RavenfallUI"]
+visible = false
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -200.0
-offset_top = 24.0
+offset_top = 72.0
 offset_right = 200.0
-offset_bottom = 80.0
+offset_bottom = 128.0
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 40
 text = "🏰 Ravenfall"
 horizontal_alignment = 1
 
 [node name="ActionBar" type="HBoxContainer" parent="RavenfallUI"]
+visible = false
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -377,3 +380,6 @@ script = ExtResource("21_compass")
 [node name="NpcInteraction" type="CanvasLayer" parent="."]
 script = ExtResource("23_talk")
 player_path = NodePath("../Player")
+
+[node name="NavBar" type="CanvasLayer" parent="."]
+script = ExtResource("24_nav")

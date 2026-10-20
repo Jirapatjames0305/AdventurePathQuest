@@ -31,6 +31,7 @@ const WRITE_INTERVAL := 0.25
 
 var _player: Node3D
 var _readout: Label
+var _legend: Label
 var _write_timer := 0.0
 var _marks := 0
 
@@ -44,7 +45,7 @@ static func to_world(lat: float, long: float) -> Vector3:
 
 
 func _ready() -> void:
-	visible = false  # grid starts hidden; press G to show it
+	visible = false  # grid starts hidden; press G (or F7) to show it
 	_player = get_node_or_null(player_path)
 	_build_lines()
 	_build_labels()
@@ -55,7 +56,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
 			KEY_G:
-				visible = not visible
+				set_grid_visible(not visible)
 			KEY_P:
 				_mark()
 
@@ -133,7 +134,21 @@ func _build_labels() -> void:
 			add_child(label)
 
 
-## The hero's coordinates (top-center) and a legend (bottom-left).
+func set_grid_visible(on: bool) -> void:
+	visible = on
+	if _legend:
+		_legend.visible = on
+
+
+func set_coords_visible(on: bool) -> void:
+	_readout.visible = on
+
+
+func coords_visible() -> bool:
+	return _readout.visible
+
+
+## The hero's coordinates (top-center) and a legend (bottom-left, shown with the grid).
 func _build_hud() -> void:
 	var hud := CanvasLayer.new()
 	hud.name = "MapHud"
@@ -155,6 +170,7 @@ func _build_hud() -> void:
 	hud.add_child(_readout)
 
 	var legend := Label.new()
+	_legend = legend
 	legend.text = "lat + = North (up-left)   long + = East (up-right)   0,0 = fountain   G = grid on/off   P = mark spot"
 	legend.add_theme_font_size_override("font_size", 18)
 	legend.add_theme_color_override("font_color", Color.WHITE)
@@ -163,5 +179,6 @@ func _build_hud() -> void:
 	legend.anchor_top = 1.0
 	legend.anchor_bottom = 1.0
 	legend.offset_left = 24.0
-	legend.offset_top = -48.0
+	legend.offset_top = -136.0
 	hud.add_child(legend)
+	legend.visible = visible

@@ -25,6 +25,40 @@ func _ready() -> void:
 	_refresh()
 
 
+# --- Used by the F1–F10 navbar ---
+
+func toggle_status() -> bool:
+	var on: bool = not $StatsPanel.visible
+	$StatsPanel.visible = on
+	$TownTitle.visible = on
+	_refresh()
+	return on
+
+
+func status_visible() -> bool:
+	return $StatsPanel.visible
+
+
+func open_shop(shop: String) -> void:
+	_open_shop(shop)
+
+
+func open_bag() -> void:
+	_open_bag()
+
+
+func close_panel() -> void:
+	shop_panel.hide()
+
+
+func panel_visible() -> bool:
+	return shop_panel.visible
+
+
+func rest() -> void:
+	_on_rest_pressed()
+
+
 func _on_rest_pressed() -> void:
 	GameManager.rest()
 	_refresh()
