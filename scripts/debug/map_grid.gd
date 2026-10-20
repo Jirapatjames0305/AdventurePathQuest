@@ -5,7 +5,9 @@ extends Node3D
 ## Directions follow the screen (isometric camera yaw 45°):
 ##   North = up the screen, East = right on the screen.
 ## Origin (lat 0, long 0) is the town fountain; 1 unit = 1 world metre.
-## Press G to toggle the grid.
+## Press G to toggle the grid, P to mark the hero's current spot.
+## The hero's live position is written to user://player_position.txt and
+## every mark is appended to user://map_marks.txt (and printed as [MARK]).
 
 ## World directions that appear as straight up / right on screen.
 const NORTH := Vector3(-0.70710678, 0.0, -0.70710678)
@@ -19,11 +21,16 @@ const MINOR_COLOR := Color(1, 1, 1, 0.25)
 const MAJOR_COLOR := Color(1, 1, 1, 0.55)
 const LAT_AXIS_COLOR := Color(1.0, 0.35, 0.3, 0.9)   # lat 0 line (runs east–west)
 const LONG_AXIS_COLOR := Color(0.35, 0.6, 1.0, 0.9)  # long 0 line (runs north–south)
+const POSITION_FILE := "user://player_position.txt"
+const MARKS_FILE := "user://map_marks.txt"
+const WRITE_INTERVAL := 0.25
 
 @export var player_path: NodePath
 
 var _player: Node3D
 var _readout: Label
+var _write_timer := 0.0
+var _marks := 0
 
 
 static func to_lat_long(world: Vector3) -> Vector2:
@@ -42,14 +49,41 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_G:
-		visible = not visible
+	if event is InputEventKey and event.pressed and not event.echo:
+		match event.keycode:
+			KEY_G:
+				visible = not visible
+			KEY_P:
+				_mark()
 
 
-func _process(_delta: float) -> void:
-	if _player and _readout:
-		var at := to_lat_long(_player.global_position)
+func _process(delta: float) -> void:
+	if not _player:
+		return
+	var at := to_lat_long(_player.global_position)
+	if _readout:
 		_readout.text = "📍 lat %.1f   long %.1f" % [at.x, at.y]
+	_write_timer += delta
+	if _write_timer >= WRITE_INTERVAL:
+		_write_timer = 0.0
+		var file := FileAccess.open(POSITION_FILE, FileAccess.WRITE)
+		if file:
+			file.store_string("lat %.1f long %.1f\n" % [at.x, at.y])
+
+
+func _mark() -> void:
+	if not _player:
+		return
+	_marks += 1
+	var at := to_lat_long(_player.global_position)
+	var line := "[MARK] #%d lat %.1f long %.1f" % [_marks, at.x, at.y]
+	print(line)
+	var file := FileAccess.open(MARKS_FILE, FileAccess.READ_WRITE if FileAccess.file_exists(MARKS_FILE) else FileAccess.WRITE)
+	if file:
+		file.seek_end()
+		file.store_line(line)
+	if _readout:
+		_readout.text += "   ✔ mark #%d" % _marks
 
 
 func _build_lines() -> void:
@@ -132,7 +166,7 @@ func _build_hud() -> void:
 	hud.add_child(_readout)
 
 	var legend := Label.new()
-	legend.text = "lat + = North (up)   long + = East (right)   0,0 = fountain   G = grid on/off"
+	legend.text = "lat + = North (up)   long + = East (right)   0,0 = fountain   G = grid on/off   P = mark spot"
 	legend.add_theme_font_size_override("font_size", 18)
 	legend.add_theme_color_override("font_color", Color.WHITE)
 	legend.add_theme_color_override("font_outline_color", Color.BLACK)
