@@ -109,7 +109,7 @@ script = ExtResource("8_path")
 corners = PackedVector3Array(-2, 0, -22.6, -2, 0, -16.0)
 
 [node name="Blacksmith" type="Node3D" parent="."]
-transform = Transform3D(0, 0, 0.75, 0, 0.75, 0, -0.75, 0, 0, -44, 0, 0)
+transform = Transform3D(0, 0, 0.55, 0, 0.55, 0, -0.55, 0, 0, -42.2, 0, 0)
 script = ExtResource("11_smith")
 
 [node name="BlacksmithPath" type="MeshInstance3D" parent="."]
