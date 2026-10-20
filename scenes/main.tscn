@@ -166,6 +166,11 @@ script = ExtResource("14_magic")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 0, -40)
 script = ExtResource("16_park")
 
+[node name="SouthRoad" type="MeshInstance3D" parent="."]
+script = ExtResource("8_path")
+corners = PackedVector3Array(60, 0, 0, 16, 0, 0)
+width = 5.0
+
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1249246146]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 1, 3.2)
 script = ExtResource("1_player")
