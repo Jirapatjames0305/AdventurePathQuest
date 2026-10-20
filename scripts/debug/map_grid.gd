@@ -44,6 +44,7 @@ static func to_world(lat: float, long: float) -> Vector3:
 
 
 func _ready() -> void:
+	visible = false  # grid starts hidden; press G to show it
 	_player = get_node_or_null(player_path)
 	_build_lines()
 	_build_labels()

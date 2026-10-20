@@ -11,6 +11,8 @@ const TURN_SPEED := 6.0
 @export var character_id := "knight"
 @export var display_name := "Villager"
 @export var role := ""
+## What pressing F opens: "quests", "store", "magic" or "smith" (see NpcInteraction).
+@export var service := "store"
 @export var marker_color := Color(0.95, 0.78, 0.3)
 ## Direction the NPC faces when the hero isn't near (radians around Y).
 @export var rest_yaw := 0.0

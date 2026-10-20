@@ -11,9 +11,18 @@ const BLACKSMITH_STOCK: Array[String] = [
 	"res://data/equipment/reinforced_sword.tres",
 ]
 
+const MAGIC_SHOP_STOCK: Array[String] = [
+	"res://data/items/greater_potion.tres",
+	"res://data/items/elixir.tres",
+]
 
+
+## shop: "potion" (general store), "smith" (weapons) or "magic".
 func get_stock(shop: String) -> Array[ItemData]:
-	var paths := POTION_SHOP_STOCK if shop == "potion" else BLACKSMITH_STOCK
+	var paths: Array[String] = BLACKSMITH_STOCK
+	match shop:
+		"potion": paths = POTION_SHOP_STOCK
+		"magic": paths = MAGIC_SHOP_STOCK
 	var stock: Array[ItemData] = []
 	for path in paths:
 		stock.append(load(path))

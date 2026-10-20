@@ -8,6 +8,9 @@ const MOVE_SPEED := 6.0
 const SPRINT_MULTIPLIER := 1.8
 const CAMERA_YAW_DEGREES := 45.0
 
+## Set while a shop / quest window is open so the hero stands still.
+static var input_locked := false
+
 @onready var model: CharacterModel = $Model
 
 
@@ -21,12 +24,12 @@ func _enter_tree() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var input_dir := Vector2.ZERO if input_locked else Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var direction := Vector3(input_dir.x, 0.0, input_dir.y).rotated(
 		Vector3.UP, deg_to_rad(CAMERA_YAW_DEGREES)
 	)
 
-	var sprinting := Input.is_action_pressed("sprint")
+	var sprinting := Input.is_action_pressed("sprint") and not input_locked
 	var speed := MOVE_SPEED * (SPRINT_MULTIPLIER if sprinting else 1.0)
 	velocity.x = direction.x * speed
 	velocity.z = direction.z * speed

@@ -49,6 +49,7 @@ func apply_victory_rewards(enemy: EnemyData) -> Dictionary:
 	player_data.power += reward.power
 	player_data.gold += reward.gold
 	reward["level_ups"] = player_data.gain_exp(enemy.exp_reward)
+	QuestManager.record_kill(enemy.display_name)
 	return reward
 
 

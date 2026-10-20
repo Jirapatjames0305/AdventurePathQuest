@@ -109,8 +109,28 @@ func _ready() -> void:
 		printerr("[TEST] FAIL: level-up growth wrong (HP %d/%d, Power %d, Speed %d)" % [p.hp, p.max_hp, p.power, p.speed])
 		ok = false
 
+	# --- Guild quests: accept, kills count only once accepted, claim pays out ---
+	var wolf: EnemyData = load("res://data/enemies/forest_wolf.tres")
+	if QuestManager.state("wolf_cull") != QuestManager.State.AVAILABLE:
+		printerr("[TEST] FAIL: wolf quest should start available (earlier kill must not count)")
+		ok = false
+	QuestManager.accept("wolf_cull")
+	for i in 3:
+		GameManager.apply_victory_rewards(wolf)
+	if QuestManager.state("wolf_cull") != QuestManager.State.READY or QuestManager.progress("wolf_cull") != 3:
+		printerr("[TEST] FAIL: 3 wolf kills should complete the wolf quest")
+		ok = false
+	var gold_before_claim: int = p.gold
+	QuestManager.claim("wolf_cull")
+	if p.gold != gold_before_claim + 25 or QuestManager.state("wolf_cull") != QuestManager.State.CLAIMED:
+		printerr("[TEST] FAIL: claiming the wolf quest should pay 25 gold once")
+		ok = false
+	if ShopManager.get_stock("magic").size() != 2:
+		printerr("[TEST] FAIL: magic shop should stock 2 potions")
+		ok = false
+
 	if ok:
-		print("[TEST] PASS — combat, map, shop, inventory, equipment, and level-up all work")
+		print("[TEST] PASS — combat, map, shop, inventory, equipment, level-up, and quests all work")
 		get_tree().quit(0)
 	else:
 		get_tree().quit(1)

@@ -22,6 +22,7 @@
 [ext_resource type="Script" path="res://scripts/ui/minimap.gd" id="20_minimap"]
 [ext_resource type="Script" path="res://scripts/ui/compass_rose.gd" id="21_compass"]
 [ext_resource type="Script" path="res://scripts/world/plaza_npcs.gd" id="22_npcs"]
+[ext_resource type="Script" path="res://scripts/ui/npc_interaction.gd" id="23_talk"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.5, 0.6, 0.8, 1)
@@ -372,3 +373,7 @@ player_path = NodePath("../../Player")
 [node name="Compass" type="Control" parent="MinimapLayer"]
 layout_mode = 3
 script = ExtResource("21_compass")
+
+[node name="NpcInteraction" type="CanvasLayer" parent="."]
+script = ExtResource("23_talk")
+player_path = NodePath("../Player")

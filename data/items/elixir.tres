@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/inventory/item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "elixir"
+display_name = "Elixir"
+emoji = "✨"
+type = "potion"
+value = 250
+price = 40
+description = "Liquid starlight in a tiny vial. Restores 250 HP."
