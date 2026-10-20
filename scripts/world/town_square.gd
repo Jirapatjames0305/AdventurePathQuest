@@ -12,17 +12,18 @@ const STONE_DARK := Color(0.6, 0.58, 0.54)
 const BASIN_RADIUS := 3.0
 const BASIN_HEIGHT := 0.75
 
-## Market stalls on the brick plaza, in the top-left and bottom-right corners
-## of the screen (world −X and +X with the isometric camera).
+## Market stalls just outside the brick plaza, in the top-left and
+## bottom-right corners of the screen (world −X and +X with the isometric
+## camera), facing the fountain.
 ## Each entry: [angle° around the fountain, awning colour, goods].
-const STALL_RADIUS := 7.6
+const STALL_RADIUS := 11.8
 const STALLS := [
-	[155.0, Color(0.85, 0.3, 0.28), MarketStall.Goods.FRUIT],
+	[158.0, Color(0.85, 0.3, 0.28), MarketStall.Goods.FRUIT],
 	[180.0, Color(0.3, 0.5, 0.85), MarketStall.Goods.CLOTH],
-	[205.0, Color(0.95, 0.75, 0.3), MarketStall.Goods.POTTERY],
-	[-25.0, Color(0.4, 0.7, 0.45), MarketStall.Goods.POTTERY],
+	[202.0, Color(0.95, 0.75, 0.3), MarketStall.Goods.POTTERY],
+	[-22.0, Color(0.4, 0.7, 0.45), MarketStall.Goods.POTTERY],
 	[0.0, Color(0.85, 0.45, 0.65), MarketStall.Goods.FRUIT],
-	[25.0, Color(0.95, 0.55, 0.25), MarketStall.Goods.CLOTH],
+	[22.0, Color(0.95, 0.55, 0.25), MarketStall.Goods.CLOTH],
 ]
 
 
