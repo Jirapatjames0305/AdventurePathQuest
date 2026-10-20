@@ -34,10 +34,25 @@ const STALLS := [
 
 
 func _ready() -> void:
+	add_to_group("paved_area")
 	_build_square_floor()
 	_build_plaza()
 	_build_fountain()
 	_build_stalls()
+	# Raised kerb round the square, open where roads come in (needs roads registered).
+	_build_kerb.call_deferred()
+
+
+## World-space test used by road kerbs: is `point` on the brick square?
+func covers(point: Vector3, margin: float) -> bool:
+	var local := to_local(point)
+	return absf(local.x) < SQUARE_HALF_SIZE + margin and absf(local.z) < SQUARE_HALF_SIZE + margin
+
+
+func _build_kerb() -> void:
+	var r := SQUARE_HALF_SIZE + RoadKerbs.BLOCK.x / 2.0 - 0.05
+	var line := PackedVector3Array([Vector3(-r, 0, -r), Vector3(r, 0, -r), Vector3(r, 0, r), Vector3(-r, 0, r), Vector3(-r, 0, -r)])
+	add_child(RoadKerbs.make_instance(RoadKerbs.blocks_along(self, line, 0.0), 99))
 
 
 func _build_square_floor() -> void:
