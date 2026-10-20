@@ -26,9 +26,10 @@ const STALLS := [
 	[158.0, Color(0.85, 0.3, 0.28), MarketStall.Goods.FRUIT],
 	[180.0, Color(0.3, 0.5, 0.85), MarketStall.Goods.CLOTH],
 	[202.0, Color(0.95, 0.75, 0.3), MarketStall.Goods.POTTERY],
-	[-22.0, Color(0.4, 0.7, 0.45), MarketStall.Goods.POTTERY],
-	[0.0, Color(0.85, 0.45, 0.65), MarketStall.Goods.FRUIT],
-	[22.0, Color(0.95, 0.55, 0.25), MarketStall.Goods.CLOTH],
+	# Bottom-right group leaves a gap at 0° for the road out of town.
+	[-42.0, Color(0.4, 0.7, 0.45), MarketStall.Goods.POTTERY],
+	[-24.0, Color(0.85, 0.45, 0.65), MarketStall.Goods.FRUIT],
+	[24.0, Color(0.95, 0.55, 0.25), MarketStall.Goods.CLOTH],
 ]
 
 
