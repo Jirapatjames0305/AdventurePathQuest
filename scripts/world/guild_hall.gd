@@ -1,6 +1,7 @@
 class_name GuildHall
 extends Node3D
 ## The Adventurers' Guild — a grand palace where heroes take on quests.
+## White plaster walls with dark timber edges (corner posts, cornices, rings).
 ## Built from primitives: plinth and steps, columned portico, main hall,
 ## central keep with spire, side wings, round corner towers, lit windows,
 ## banners and a quest board. Luxury touches: gold cornices and window
@@ -8,9 +9,10 @@ extends Node3D
 ## urns on the newel posts and flaming braziers at the stair foot.
 ## Local +Z is the front (faces the plaza).
 
-const STONE := Color(0.84, 0.8, 0.72)
-const STONE_DARK := Color(0.56, 0.53, 0.49)
-const TRIM := Color(0.7, 0.66, 0.6)
+## White plaster walls with dark wooden trim (no brick or stone pattern).
+const STONE := Color(0.96, 0.95, 0.91)
+const STONE_DARK := Color(0.82, 0.8, 0.76)
+const TRIM := Color(0.38, 0.25, 0.15)
 const ROOF := Color(0.26, 0.36, 0.56)
 const GOLD := Color(0.92, 0.74, 0.32)
 const WOOD := Color(0.36, 0.23, 0.13)
@@ -64,6 +66,7 @@ func _process(delta: float) -> void:
 func _build_hall(base: float) -> void:
 	var center := Vector3(0, base + HALL.y / 2.0, 0)
 	_box(HALL, "stone", center)
+	_corner_posts(Vector3(0, base, 0), HALL)
 	_box(Vector3(HALL.x + 0.3, 0.35, HALL.z + 0.3), "trim", Vector3(0, base + HALL.y, 0))
 	_box(Vector3(HALL.x + 0.36, 0.1, HALL.z + 0.36), "gold", Vector3(0, base + HALL.y - 0.2, 0))
 	_roof(Vector3(HALL.x + 0.6, 3.2, HALL.z + 0.8), Vector3(0, base + HALL.y + 1.6 + 0.17, 0))
@@ -79,6 +82,7 @@ func _build_wings(base: float) -> void:
 	for side in [-1.0, 1.0]:
 		var x: float = side * (HALL.x / 2.0 + WING.x / 2.0)
 		_box(WING, "stone", Vector3(x, base + WING.y / 2.0, 0.3))
+		_corner_posts(Vector3(x, base, 0.3), WING)
 		_box(Vector3(WING.x + 0.3, 0.3, WING.z + 0.3), "trim", Vector3(x, base + WING.y, 0.3))
 		_box(Vector3(WING.x + 0.36, 0.08, WING.z + 0.36), "gold", Vector3(x, base + WING.y - 0.18, 0.3))
 		_banner(Vector3(x, base + WING.y - 0.4, 0.3 + WING.z / 2.0 + 0.05), 2.4)
@@ -90,6 +94,9 @@ func _build_wings(base: float) -> void:
 func _build_keep(base: float) -> void:
 	var z := -1.2
 	_box(KEEP, "stone", Vector3(0, base + KEEP.y / 2.0, z))
+	_corner_posts(Vector3(0, base, z), KEEP)
+	for y in [4.0, 8.0]:
+		_box(Vector3(KEEP.x + 0.12, 0.2, KEEP.z + 0.12), "trim", Vector3(0, base + y, z))
 	_box(Vector3(KEEP.x + 0.4, 0.4, KEEP.z + 0.4), "trim", Vector3(0, base + KEEP.y, z))
 	_box(Vector3(KEEP.x + 0.46, 0.1, KEEP.z + 0.46), "gold", Vector3(0, base + KEEP.y - 0.22, z))
 	_window(Vector3(0, base + 8.0, z + KEEP.z / 2.0), Vector2(0.8, 1.3))
@@ -119,6 +126,8 @@ func _build_towers(base: float) -> void:
 	for spot in spots:
 		var at := Vector3(spot.x, base, spot.y)
 		_cylinder(TOWER_RADIUS, TOWER_RADIUS + 0.1, TOWER_HEIGHT, "stone", at, 16)
+		for y in [0.0, 4.0, 7.5]:
+			_cylinder(TOWER_RADIUS + 0.08, TOWER_RADIUS + 0.12, 0.25, "trim", at + Vector3.UP * y, 16)
 		_cylinder(TOWER_RADIUS + 0.25, TOWER_RADIUS + 0.25, 0.35, "trim", at + Vector3.UP * TOWER_HEIGHT, 16)
 		_cylinder(TOWER_RADIUS + 0.3, TOWER_RADIUS + 0.3, 0.1, "gold", at + Vector3.UP * (TOWER_HEIGHT - 0.12), 16)
 		_cylinder(0.0, TOWER_RADIUS + 0.4, TOWER_ROOF, "roof", at + Vector3.UP * (TOWER_HEIGHT + 0.35), 16)
@@ -156,6 +165,13 @@ func _build_portico(base: float) -> void:
 	arch.rotation.x = PI / 2.0
 	arch.position.y = base + 2.8
 	_box(Vector3(0.08, 2.6, 0.18), "gold", Vector3(0, base + 1.35, front + 0.08))
+
+
+## Dark timber posts up the four corners of a box-shaped block.
+func _corner_posts(base_center: Vector3, size: Vector3) -> void:
+	for x in [-size.x / 2.0, size.x / 2.0]:
+		for z in [-size.z / 2.0, size.z / 2.0]:
+			_box(Vector3(0.26, size.y, 0.26), "trim", base_center + Vector3(x, size.y / 2.0, z))
 
 
 ## Red carpet from the door down the steps, newel posts with gilded urns at
@@ -259,8 +275,9 @@ func _add_collision() -> void:
 ## Roof / plaster / stone / timber surfaces get the shared detailed shader.
 func _detailed(key: String) -> Material:
 	match key:
-		"stone": return BuildingMaterials.stone(STONE)
-		"stone_dark": return BuildingMaterials.stone(STONE_DARK)
+		"stone": return BuildingMaterials.plaster(STONE)
+		"stone_dark": return BuildingMaterials.plaster(STONE_DARK)
+		"trim": return BuildingMaterials.timber(TRIM)
 		"roof": return BuildingMaterials.roof(ROOF)
 	return null
 
