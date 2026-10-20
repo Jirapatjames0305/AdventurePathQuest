@@ -79,7 +79,9 @@ shape = SubResource("FloorShape")
 script = ExtResource("5_square")
 
 [node name="GuildHall" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -24.6)
+# Placed by the user at lat 38, long -11.4; square to the screen, entrance facing south toward the fountain.
+position = Vector3(-34.93, 0, -18.81)
+rotation_degrees = Vector3(0, 45, 0)
 script = ExtResource("6_guild")
 
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1249246146]
