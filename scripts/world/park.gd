@@ -1,24 +1,30 @@
 class_name Park
 extends Node3D
-## A large public park built from primitives: lawn inside a clipped hedge
-## border, a loop footpath around an oval pond (stone rim, lily pads), entrance
-## paths, benches facing the pond, lamp posts, flower beds and trees.
-## Coordinates are local to the park centre, axis-aligned with the town.
-## SIZE.x runs along local X, SIZE.y along local Z.
+## A large public park that blends into the town: no border, no separate
+## lawn — trees thin out toward the edges, and its paths join the plaza
+## square and the church path. A loop footpath circles an oval pond (stone
+## rim, lily pads); benches face the pond; lamps and flower beds line the
+## paths. Coordinates are local to the park centre, axis-aligned with the town.
 
-const SIZE := Vector2(34.0, 28.0)
-const LOOP_RADII := Vector2(11.0, 8.5)
-const POND_RADII := Vector2(6.0, 4.2)
-const PATH_WIDTH := 2.6
-const HEDGE_HEIGHT := 1.0
-const HEDGE_WIDTH := 0.9
-## Entrance gaps in the hedge: [side ("x-", "x+", "z-", "z+"), offset along that side].
-const ENTRANCES := [["z+", -12.0], ["z+", 10.0]]
-const TREE_COUNT := 30
+## Trees are scattered inside this ellipse, densest in the middle.
+const TREE_AREA := Vector2(27.0, 23.0)
+const TREE_COUNT := 60
+const TREE_SPACING := 3.4
+const LOOP_RADII := Vector2(15.0, 11.0)
+const POND_RADII := Vector2(9.0, 6.0)
+const PATH_WIDTH := 2.8
+## Footpaths besides the loop, in local coords (straight segments, square corners).
+## The first joins the plaza square's edge; the second the church path.
+const PATHS := [
+	[Vector3(-18, 0, 24), Vector3(-18, 0, 0), Vector3(-15, 0, 0)],
+	[Vector3(-27, 0, 21), Vector3(-18, 0, 21)],
+	[Vector3(15, 0, 0), Vector3(28, 0, 0)],
+	[Vector3(0, 0, -11), Vector3(0, 0, -25)],
+]
+## World-space boxes (x, z min/max) kept clear of trees: plaza square, church.
+const KEEP_CLEAR := [Rect2(-17, -17, 34, 34), Rect2(-8, -48, 12, 28)]
 const SEED := 4242
 
-const LAWN := Color(0.5, 0.72, 0.36)
-const HEDGE := Color(0.22, 0.45, 0.22)
 const STONE := Color(0.7, 0.68, 0.63)
 const WOOD := Color(0.5, 0.33, 0.2)
 const IRON := Color(0.15, 0.15, 0.17)
@@ -34,14 +40,14 @@ const WATER_SHADER := preload("res://shaders/fountain_water.gdshader")
 var _materials := {}
 var _rng := RandomNumberGenerator.new()
 var _body: StaticBody3D
+## All path polylines (loop included), for keeping trees and props off them.
+var _path_lines: Array[PackedVector3Array] = []
 
 
 func _ready() -> void:
 	_rng.seed = SEED
 	_body = StaticBody3D.new()
 	add_child(_body)
-	_lawn()
-	_hedges()
 	_paths()
 	_pond()
 	_benches_and_lamps()
@@ -49,64 +55,32 @@ func _ready() -> void:
 	_trees()
 
 
-func _lawn() -> void:
-	var plane := PlaneMesh.new()
-	plane.size = SIZE
-	_mesh(plane, "lawn", Vector3(0, 0.01, 0))
-
-
-## Hedge boxes around the edge, leaving gaps where the entrances are.
-func _hedges() -> void:
-	var half := SIZE / 2.0
-	var gap := PATH_WIDTH + 1.0
-	for side in ["x-", "x+", "z-", "z+"]:
-		var along_x: bool = side.begins_with("z")
-		var length: float = SIZE.x if along_x else SIZE.y
-		var cuts := [-length / 2.0]
-		for entrance in ENTRANCES:
-			if entrance[0] == side:
-				cuts.append(entrance[1] - gap / 2.0)
-				cuts.append(entrance[1] + gap / 2.0)
-		cuts.append(length / 2.0)
-		for i in range(0, cuts.size(), 2):
-			var from: float = cuts[i]
-			var to: float = cuts[i + 1]
-			var center := (from + to) / 2.0
-			var at: Vector3
-			var size: Vector3
-			if along_x:
-				at = Vector3(center, HEDGE_HEIGHT / 2.0, half.y * (1.0 if side == "z+" else -1.0))
-				size = Vector3(to - from, HEDGE_HEIGHT, HEDGE_WIDTH)
-			else:
-				at = Vector3(half.x * (1.0 if side == "x+" else -1.0), HEDGE_HEIGHT / 2.0, center)
-				size = Vector3(HEDGE_WIDTH, HEDGE_HEIGHT, to - from)
-			_box(size, "hedge", at)
-			_collider(size, at)
-
-
-## Loop path around the pond plus one straight path in from each entrance.
 func _paths() -> void:
 	var loop := PackedVector3Array()
-	for i in 33:
-		var a := TAU * i / 32.0
+	for i in 41:
+		var a := TAU * i / 40.0
 		loop.append(Vector3(cos(a) * LOOP_RADII.x, 0, sin(a) * LOOP_RADII.y))
 	_path(loop)
-	var half := SIZE / 2.0
-	for entrance in ENTRANCES:
-		var offset: float = entrance[1]
-		match entrance[0]:
-			"z+":
-				var join_z := LOOP_RADII.y * sqrt(maxf(0.0, 1.0 - pow(offset / LOOP_RADII.x, 2.0)))
-				_path(PackedVector3Array([Vector3(offset, 0, half.y), Vector3(offset, 0, join_z)]))
-			"x-":
-				_path(PackedVector3Array([Vector3(-half.x, 0, offset), Vector3(-LOOP_RADII.x, 0, offset)]))
+	for corners in PATHS:
+		_path(PackedVector3Array(corners))
 
 
 func _path(corners: PackedVector3Array) -> void:
+	_path_lines.append(corners)
 	var path := StonePath.new()
 	path.corners = corners
 	path.width = PATH_WIDTH
 	add_child(path)
+
+
+func _distance_to_paths(at: Vector3) -> float:
+	var best := INF
+	var flat := Vector2(at.x, at.z)
+	for line in _path_lines:
+		for i in line.size() - 1:
+			var closest := Geometry2D.get_closest_point_to_segment(flat, Vector2(line[i].x, line[i].z), Vector2(line[i + 1].x, line[i + 1].z))
+			best = minf(best, flat.distance_to(closest))
+	return best
 
 
 ## Oval pond: water, rounded stone rim, lily pads with a few blossoms.
@@ -126,18 +100,18 @@ func _pond() -> void:
 	var rim := TorusMesh.new()
 	rim.inner_radius = 1.0
 	rim.outer_radius = 1.0 + 0.6 / POND_RADII.y
-	rim.rings = 48
+	rim.rings = 64
 	var rim_node := _mesh(rim, "stone", Vector3(0, 0.08, 0))
 	rim_node.scale = Vector3(POND_RADII.x, 0.35, POND_RADII.y)
-	for i in 9:
+	for i in 14:
 		var a := _rng.randf() * TAU
-		var r := _rng.randf_range(0.3, 0.8)
+		var r := _rng.randf_range(0.3, 0.82)
 		var at := Vector3(cos(a) * POND_RADII.x * r, 0.08, sin(a) * POND_RADII.y * r)
-		_cylinder(0.45, 0.45, 0.03, "lily", at, 10)
+		_cylinder(0.5, 0.5, 0.03, "lily", at, 10)
 		if i % 3 == 0:
 			var bloom := SphereMesh.new()
-			bloom.radius = 0.14
-			bloom.height = 0.2
+			bloom.radius = 0.15
+			bloom.height = 0.22
 			_mesh(bloom, "blossom", at + Vector3.UP * 0.1)
 	var pond_shape := CollisionShape3D.new()
 	var cylinder := CylinderShape3D.new()
@@ -151,15 +125,28 @@ func _pond() -> void:
 
 ## Benches just outside the loop facing the pond; lamp posts between them.
 func _benches_and_lamps() -> void:
-	for i in 6:
-		var a := TAU * (i + 0.5) / 6.0
-		var at := Vector3(cos(a) * (LOOP_RADII.x + 2.4), 0, sin(a) * (LOOP_RADII.y + 2.4))
-		if _near_entrance_path(at, 2.5):
+	for i in 10:
+		var a := TAU * (i + 0.5) / 10.0
+		var at := Vector3(cos(a) * (LOOP_RADII.x + 2.5), 0, sin(a) * (LOOP_RADII.y + 2.5))
+		if _crosses_spoke(at, 2.6):
 			continue
 		_bench(at, atan2(-at.x, -at.z))
-	for i in 4:
-		var a := TAU * i / 4.0 + PI / 4.0
-		_lamp(Vector3(cos(a) * (LOOP_RADII.x + 2.2), 0, sin(a) * (LOOP_RADII.y + 2.2)))
+	for i in 6:
+		var a := TAU * i / 6.0 + PI / 6.0
+		var at := Vector3(cos(a) * (LOOP_RADII.x + 2.3), 0, sin(a) * (LOOP_RADII.y + 2.3))
+		if not _crosses_spoke(at, 2.0):
+			_lamp(at)
+
+
+## True if `at` is near one of the straight paths (not the loop).
+func _crosses_spoke(at: Vector3, distance: float) -> bool:
+	var flat := Vector2(at.x, at.z)
+	for line in PATHS:
+		for i in line.size() - 1:
+			var closest := Geometry2D.get_closest_point_to_segment(flat, Vector2(line[i].x, line[i].z), Vector2(line[i + 1].x, line[i + 1].z))
+			if flat.distance_to(closest) < distance:
+				return true
+	return false
 
 
 func _bench(at: Vector3, facing: float) -> void:
@@ -171,7 +158,13 @@ func _bench(at: Vector3, facing: float) -> void:
 	_box(Vector3(2.0, 0.5, 0.1), "wood", Vector3(0, 0.85, -0.28), bench)
 	for x in [-0.85, 0.85]:
 		_box(Vector3(0.1, 0.5, 0.55), "iron", Vector3(x, 0.25, 0), bench)
-	_collider(Vector3(2.0, 1.0, 0.7), at + Vector3.UP * 0.5)
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(2.0, 1.0, 0.7)
+	shape.shape = box
+	shape.position = at + Vector3.UP * 0.5
+	shape.rotation.y = facing
+	_body.add_child(shape)
 
 
 func _lamp(at: Vector3) -> void:
@@ -186,21 +179,18 @@ func _lamp(at: Vector3) -> void:
 	add_child(light)
 
 
-## Flower beds either side of each entrance.
+## Small flower beds dotted beside the paths.
 func _flower_beds() -> void:
-	var half := SIZE / 2.0
-	for entrance in ENTRANCES:
-		var offset: float = entrance[1]
-		var spots := []
-		match entrance[0]:
-			"z+":
-				for side in [-1.0, 1.0]:
-					spots.append(Vector3(offset + side * 3.0, 0, half.y - 2.0))
-			"x-":
-				for side in [-1.0, 1.0]:
-					spots.append(Vector3(-half.x + 2.0, 0, offset + side * 3.0))
-		for spot in spots:
-			_flower_bed(spot, Vector2(2.0, 2.0))
+	var placed := 0
+	var tries := 0
+	while placed < 8 and tries < 500:
+		tries += 1
+		var at := Vector3(_rng.randf_range(-TREE_AREA.x, TREE_AREA.x) * 0.8, 0, _rng.randf_range(-TREE_AREA.y, TREE_AREA.y) * 0.8)
+		var d := _distance_to_paths(at)
+		if d < PATH_WIDTH / 2.0 + 1.2 or d > PATH_WIDTH / 2.0 + 2.5 or _in_pond_lawn(at) or _blocked(at):
+			continue
+		_flower_bed(at, Vector2(_rng.randf_range(1.6, 2.6), _rng.randf_range(1.2, 1.8)))
+		placed += 1
 
 
 func _flower_bed(at: Vector3, size: Vector2) -> void:
@@ -217,7 +207,7 @@ func _flower_bed(at: Vector3, size: Vector2) -> void:
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
 	multimesh.use_colors = true
 	multimesh.mesh = bloom
-	multimesh.instance_count = 28
+	multimesh.instance_count = int(size.x * size.y * 7.0)
 	for i in multimesh.instance_count:
 		var leaf := i % 3 == 0
 		var p := at + Vector3(_rng.randf_range(-size.x / 2.0 + 0.2, size.x / 2.0 - 0.2), 0.25 if leaf else 0.32, _rng.randf_range(-size.y / 2.0 + 0.2, size.y / 2.0 - 0.2))
@@ -228,31 +218,45 @@ func _flower_bed(at: Vector3, size: Vector2) -> void:
 	add_child(instance)
 
 
-## Round-crowned and pine trees scattered in the lawn, clear of paths and pond.
+## Trees scattered with density fading toward the edge (no hard boundary),
+## clear of paths, the open lawn round the pond, the square and the church.
 func _trees() -> void:
-	var half := SIZE / 2.0 - Vector2.ONE * 2.0
 	var placed: Array[Vector3] = []
 	var tries := 0
-	while placed.size() < TREE_COUNT and tries < 2000:
+	while placed.size() < TREE_COUNT and tries < 4000:
 		tries += 1
-		var at := Vector3(_rng.randf_range(-half.x, half.x), 0, _rng.randf_range(-half.y, half.y))
-		var loop_d := Vector2(at.x / LOOP_RADII.x, at.z / LOOP_RADII.y).length()
-		if absf(loop_d - 1.0) < 0.28 or loop_d < 1.0:
-			continue  # on the loop path, or inside it (pond area)
-		if _near_entrance_path(at, 2.8):
+		var at := Vector3(_rng.randf_range(-TREE_AREA.x, TREE_AREA.x) * 1.1, 0, _rng.randf_range(-TREE_AREA.y, TREE_AREA.y) * 1.1)
+		var edge := Vector2(at.x / TREE_AREA.x, at.z / TREE_AREA.y).length()
+		if _rng.randf() > 1.0 - smoothstep(0.55, 1.1, edge):
+			continue
+		if _in_pond_lawn(at) or _distance_to_paths(at) < PATH_WIDTH / 2.0 + 1.3 or _blocked(at):
 			continue
 		var crowded := false
 		for other in placed:
-			if other.distance_to(at) < 3.6:
+			if other.distance_to(at) < TREE_SPACING:
 				crowded = true
 				break
 		if crowded:
 			continue
 		placed.append(at)
 		if _rng.randf() < 0.3:
-			_pine(at, _rng.randf_range(0.9, 1.3))
+			_pine(at, _rng.randf_range(0.9, 1.35))
 		else:
-			_round_tree(at, _rng.randf_range(0.8, 1.3))
+			_round_tree(at, _rng.randf_range(0.8, 1.35))
+
+
+## Open lawn between the pond and the loop path stays clear.
+func _in_pond_lawn(at: Vector3) -> bool:
+	return Vector2(at.x / LOOP_RADII.x, at.z / LOOP_RADII.y).length() < 1.0
+
+
+## World-space keep-clear zones (square, church).
+func _blocked(at: Vector3) -> bool:
+	var world := global_transform * at
+	for zone: Rect2 in KEEP_CLEAR:
+		if zone.has_point(Vector2(world.x, world.z)):
+			return true
+	return false
 
 
 func _round_tree(at: Vector3, size: float) -> void:
@@ -287,28 +291,6 @@ func _trunk_collider(at: Vector3, radius: float) -> void:
 	_body.add_child(shape)
 
 
-func _near_entrance_path(at: Vector3, distance: float) -> bool:
-	for entrance in ENTRANCES:
-		var offset: float = entrance[1]
-		match entrance[0]:
-			"z+":
-				if absf(at.x - offset) < distance and at.z > 0.0:
-					return true
-			"x-":
-				if absf(at.z - offset) < distance and at.x < 0.0:
-					return true
-	return false
-
-
-func _collider(size: Vector3, at: Vector3) -> void:
-	var shape := CollisionShape3D.new()
-	var box := BoxShape3D.new()
-	box.size = size
-	shape.shape = box
-	shape.position = at
-	_body.add_child(shape)
-
-
 func _material(key: String) -> StandardMaterial3D:
 	if _materials.has(key):
 		return _materials[key]
@@ -318,8 +300,6 @@ func _material(key: String) -> StandardMaterial3D:
 		material.albedo_color = LEAVES[int(key.substr(6))]
 	else:
 		match key:
-			"lawn": material.albedo_color = LAWN
-			"hedge": material.albedo_color = HEDGE
 			"stone": material.albedo_color = STONE
 			"wood": material.albedo_color = WOOD
 			"trunk": material.albedo_color = TRUNK
