@@ -5,8 +5,11 @@ extends Node3D
 
 const BRICK_SHADER := preload("res://shaders/brick_paving.gdshader")
 const WATER_SHADER := preload("res://shaders/fountain_water.gdshader")
+const SQUARE_SHADER := preload("res://shaders/brick_square.gdshader")
 
 const PLAZA_RADIUS := 10.0
+## Square brick floor (different brick colour) under the plaza and stalls.
+const SQUARE_HALF_SIZE := 16.0
 const STONE := Color(0.8, 0.77, 0.71)
 const STONE_DARK := Color(0.6, 0.58, 0.54)
 const BASIN_RADIUS := 3.0
@@ -30,9 +33,24 @@ const STALLS := [
 
 
 func _ready() -> void:
+	_build_square_floor()
 	_build_plaza()
 	_build_fountain()
 	_build_stalls()
+
+
+func _build_square_floor() -> void:
+	var plane := PlaneMesh.new()
+	plane.size = Vector2.ONE * SQUARE_HALF_SIZE * 2.0
+	var material := ShaderMaterial.new()
+	material.shader = SQUARE_SHADER
+	material.set_shader_parameter("half_size", SQUARE_HALF_SIZE)
+	var square := MeshInstance3D.new()
+	square.name = "BrickSquare"
+	square.mesh = plane
+	square.material_override = material
+	square.position.y = 0.015
+	add_child(square)
 
 
 func _build_plaza() -> void:
