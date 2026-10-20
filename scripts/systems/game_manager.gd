@@ -7,14 +7,14 @@ const SCENE_RAVENFALL := "res://scenes/main.tscn"
 const SCENE_BLACKWOOD := "res://scenes/world/forest/blackwood.tscn"
 const SCENE_COMBAT := "res://scenes/combat/combat.tscn"
 
-var player_data: PlayerData
+## Created at declaration so scenes entering the tree before _ready can read it.
+var player_data := PlayerData.new()
 
 ## Enemy chosen in Blackwood, consumed by the combat scene.
 var current_enemy: EnemyData
 
 
 func _ready() -> void:
-	player_data = PlayerData.new()
 	print("[GameManager] Ready — Player Lv.%d | Power %d | HP %d/%d | Speed %d | Gold %d" % [
 		player_data.level,
 		player_data.power,
