@@ -43,7 +43,21 @@ Ravenfall → Blackwood → Enemy Selection → Auto Combat → Reward → Raven
 - [x] ShopManager autoload; quick potion use on the Blackwood map screen
 - [x] Tests extended: buy/use/equip/level-up all verified headless
 
-## Phase 3 — Data-Driven Content ⬅ NEXT
+## 🔀 Direction change (2026-10-20) — open world + real-time action
+
+Turn-based automatic combat and node-based map selection are dropped. The game
+becomes an open world where the hero walks out of Ravenfall into the wilds and
+fights monsters in real time where they stand. Full spec and the OW1–OW6 plan:
+[game_design.md → Direction change](game_design.md#direction-change-2026-10-20-open-world--real-time-action-combat).
+
+- [ ] OW1 Seamless world (town → road → Blackwood in one scene)
+- [ ] OW2 Hero combat (attack, dodge, HP HUD, potion hotkey)
+- [ ] OW3 Monster AI (wander, aggro, chase, telegraphed attack, leash)
+- [ ] OW4 Rewards, death and respawn
+- [ ] OW5 Boss lair and world treasure
+- [ ] OW6 Remove the old turn-based / node-map code, update tests
+
+## Phase 3 — Data-Driven Content (superseded by the direction change above)
 
 Maps as data files, Blackwood expanded to 10–15 nodes with branching routes,
 more enemies/items, events

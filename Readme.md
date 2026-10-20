@@ -15,7 +15,7 @@
 **Camera:** Orthographic Camera
 **Engine:** Godot 4.x
 **Language:** GDScript
-**Core Gameplay:** Node-based Exploration + Automatic Combat
+**Core Gameplay:** ~~Node-based Exploration + Automatic Combat~~ → **Open World + Real-time Action Combat** (direction change 2026-10-20, see [docs/game_design.md](docs/game_design.md))
 
 ### Core Loop
 
@@ -399,6 +399,8 @@ Node
 ---
 
 # 11. Combat System
+
+> 🔀 **Superseded (2026-10-20):** combat is moving to real-time action in an open world. The automatic turn-based rules below describe Prototype 0.2 only. New rules: [docs/game_design.md → Direction change](docs/game_design.md).
 
 ## Automatic Combat
 

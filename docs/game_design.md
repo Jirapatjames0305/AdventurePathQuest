@@ -11,9 +11,65 @@ This file will hold detailed game design notes as they evolve beyond the roadmap
 
 ---
 
+## Direction change (2026-10-20): open world + real-time action combat
+
+**Decision (user, 2026-10-20):** drop turn-based auto combat and node-based map
+selection. THE FRONTIER becomes an **open world** where the hero walks out of
+Ravenfall into the wild and **fights monsters in real time, right where they
+stand** — no separate combat screen, no clicking an enemy card.
+
+### What changes
+
+| Area | Before (Prototype 0.2) | New direction |
+|---|---|---|
+| World | Town → world map → pick a region → node map | One continuous open world: Ravenfall's gate opens onto the wilderness; Blackwood is a region you walk into |
+| Picking a fight | Click an enemy node / card | Walk up to a monster; it notices you and attacks |
+| Combat | Automatic, turn order by Speed, battle log | Real-time action: you move, attack and dodge yourself |
+| Combat screen | Separate scene (`scenes/combat/combat.tscn`) | Removed — fights happen in the world |
+| Map progression | `MapManager` nodes + unlock rules | Regions and spawn zones; the boss lair opens when its condition is met |
+
+### Real-time combat rules (first version)
+
+- **Controls:** WASD move (existing), Shift sprint (existing), **left click / J = attack** (swing toward the mouse / facing), **Space = dodge roll** (short invulnerable dash, cooldown), **1 = drink potion**.
+- **Stats carry over** from `PlayerData` / `EnemyData` so balance work isn't lost:
+  - Damage per hit = attacker Power × 10% (same `DAMAGE_FACTOR`), weapon ATK still adds to the hero's Power.
+  - Speed sets attack rate and move speed (higher Speed → shorter swing cooldown).
+  - HP unchanged; level-up growth unchanged.
+- **Monster AI:** idle / wander in its spawn zone → **aggro** when the hero comes within range → chase → wind-up (telegraphed) → attack → returns home if the hero runs too far (**leash**).
+- **Feedback:** HP bar over each monster, hero HP in the HUD, hit sparks + damage numbers + hit-flash (existing `Vfx`), knock-back on hit.
+- **Rewards:** on kill, gold + EXP as before (`GameManager.apply_victory_rewards`), Power reward kept, guild quest kills still count (`QuestManager.record_kill`). Gold/EXP pop as floating text; loot drops can come later.
+- **Death:** hero at 0 HP faints and wakes in Ravenfall with 1 HP (same spirit as the old "escape with 1 HP" rule).
+- **Respawn:** common monsters respawn in their zone after a delay; the boss doesn't.
+- **Treasure:** chests sit in the world; walk up and press F (same interaction as NPCs).
+
+### Open world layout (first version)
+
+- Ravenfall (walled town, existing) → south gate → **road into the wilds** → **Blackwood** (pines, clearing, wolves + boars) → **Alpha Wolf's lair** deeper in (opens after the wolves and boars are thinned out — exact rule TBD).
+- Same isometric camera that follows the hero; the minimap grows to show the region around the hero.
+- Region edges and locked future areas (Crystal Caves, Ancient Ruins, Saltmere Harbor) are blocked by terrain or gates for now.
+
+### Phased plan
+
+| # | Step | Done when |
+|---|---|---|
+| ⬜ OW1 | **Seamless world:** extend the ground beyond the gate, road into a Blackwood region built in the same scene (reuse the 3D forest from V8) | Walk from the fountain to Blackwood without a loading screen |
+| ⬜ OW2 | **Hero combat:** attack (click / J) with swing animation + hitbox, dodge roll, hero HP in HUD, potion hotkey | Hero can swing and dodge anywhere |
+| ⬜ OW3 | **Monster AI:** wander, aggro, chase, telegraphed attack, leash, HP bars, hit reactions, death | A wolf notices you, attacks, and can be killed |
+| ⬜ OW4 | **Rewards & death:** gold / EXP / Power / quest progress on kill, level-up burst, faint → wake in town, respawn timers | A full hunt loop works with the guild quests |
+| ⬜ OW5 | **Boss & treasure:** Alpha Wolf lair with its unlock rule, boss attack pattern, world chests opened with F | Boss fight works; chests give their rewards once |
+| ⬜ OW6 | **Clean-up:** remove the combat scene, node map logic and world-map travel that no longer apply; update tests to the new loop | Old turn-based code is gone; tests cover the real-time loop |
+
+### Open questions
+
+- Keep the painted world map as a **fast-travel / overview** screen (e.g. on M), or remove it?
+- Hero attack style per class (Knight melee arc, Mage projectile…) or one melee attack for all for now?
+- Boss lair unlock rule: "kill N wolves and N boars" or a guild quest?
+
+---
+
 ## Ravenfall city spec
 
-> 🗑️ **2026-10-20:** the whole town map was removed at the user's request (they didn't like the result). The ground is a plain flat floor again. The town will be redesigned from scratch one item at a time, following the user's instructions. The table below is kept only as a reference to the original prompt.
+> 🗑️ **2026-10-20:** the first prompt-based town was removed at the user's request, and Ravenfall was then rebuilt step by step from the user's instructions (fountain plaza, Guild palace, church, blacksmith, terraced houses, tavern, general store, magic shop, park, town wall, roads, trees). The table below is kept only as a reference to the original prompt; the current town lives in `scenes/main.tscn` + `scripts/world/*`.
 
 Broken down from the art prompt ([`reference/ravenfall_prompt.md`](reference/ravenfall_prompt.md)).
 Built by `scripts/world/ravenfall_village.gd` (layout) + `scripts/world/town_decor.gd` (procedural decor).
