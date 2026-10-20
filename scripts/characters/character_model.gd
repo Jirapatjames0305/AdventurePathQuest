@@ -37,7 +37,7 @@ const CHARACTERS := {
 	},
 }
 
-const LOOPING := ["Idle", "Running_A", "Walking_A", "2H_Melee_Idle"]
+const LOOPING := ["Idle", "Running_A", "Running_B", "Walking_A", "2H_Melee_Idle"]
 const BLEND_TIME := 0.2
 
 @export var character_id := "knight"

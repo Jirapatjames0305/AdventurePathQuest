@@ -4,6 +4,8 @@ extends CharacterBody3D
 ## Input is rotated by the camera yaw so "up" moves up-screen.
 
 const MOVE_SPEED := 6.0
+## Hold Shift (the "sprint" action) to run faster.
+const SPRINT_MULTIPLIER := 1.8
 const CAMERA_YAW_DEGREES := 45.0
 
 @onready var model: CharacterModel = $Model
@@ -20,8 +22,10 @@ func _physics_process(delta: float) -> void:
 		Vector3.UP, deg_to_rad(CAMERA_YAW_DEGREES)
 	)
 
-	velocity.x = direction.x * MOVE_SPEED
-	velocity.z = direction.z * MOVE_SPEED
+	var sprinting := Input.is_action_pressed("sprint")
+	var speed := MOVE_SPEED * (SPRINT_MULTIPLIER if sprinting else 1.0)
+	velocity.x = direction.x * speed
+	velocity.z = direction.z * speed
 
 	if not is_on_floor():
 		velocity.y -= 20.0 * delta
@@ -31,7 +35,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	var moving := direction.length_squared() > 0.001
-	model.play("Running_A" if moving else "Idle")
+	model.play(("Running_B" if sprinting else "Running_A") if moving else "Idle")
 	if moving:
 		var target_yaw := atan2(direction.x, direction.z)
 		rotation.y = lerp_angle(rotation.y, target_yaw, 0.2)
