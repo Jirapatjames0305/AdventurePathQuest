@@ -14,8 +14,16 @@ static var input_locked := false
 @onready var model: CharacterModel = $Model
 
 
+## Spot just inside the town gate (used when returning from the world map).
+const GATE_SPAWN := Vector3(55.0, 1.0, 0.0)
+
+
 func _ready() -> void:
 	add_to_group("player")
+	if GameManager.town_entry == "gate":
+		GameManager.town_entry = ""
+		global_position = GATE_SPAWN
+		rotation.y = -PI / 2.0  # face into town
 
 
 func _enter_tree() -> void:

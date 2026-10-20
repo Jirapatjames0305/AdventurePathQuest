@@ -1,6 +1,6 @@
 extends CanvasLayer
 ## Bottom navbar: F1–F10 (or click) open everything that was hidden from the
-## town screen — status, bag, rest, the old shops, the way to Blackwood — and
+## town screen — status, bag, rest, the old shops, the world map — and
 ## toggle the design/HUD layers (grid, coordinates, minimap, compass).
 ## Toggle buttons show as pressed while their layer is on.
 
@@ -15,7 +15,7 @@ const ITEMS := [
 	[KEY_F3, "🛏️ Rest", "rest", false],
 	[KEY_F4, "🧪 Potions", "potion", false],
 	[KEY_F5, "⚒️ Smith", "smith", false],
-	[KEY_F6, "🌲 Blackwood", "blackwood", false],
+	[KEY_F6, "🗺️ World", "world", false],
 	[KEY_F7, "🗺️ Grid", "grid", true],
 	[KEY_F8, "📍 Coords", "coords", true],
 	[KEY_F9, "🧭 Minimap", "minimap", true],
@@ -64,7 +64,7 @@ func _run(action: String) -> void:
 			_town_ui.rest()
 			var player := GameManager.player_data
 			_show_toast("🛏️ Rested — HP %d/%d" % [player.hp, player.max_hp])
-		"blackwood": GameManager.goto_blackwood()
+		"world": GameManager.goto_world_map()
 		"grid": _grid.set_grid_visible(not _grid.visible)
 		"coords": _grid.set_coords_visible(not _grid.coords_visible())
 		"minimap": _minimap.visible = not _minimap.visible

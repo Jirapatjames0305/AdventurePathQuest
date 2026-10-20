@@ -24,6 +24,7 @@
 [ext_resource type="Script" path="res://scripts/world/plaza_npcs.gd" id="22_npcs"]
 [ext_resource type="Script" path="res://scripts/ui/npc_interaction.gd" id="23_talk"]
 [ext_resource type="Script" path="res://scripts/ui/nav_bar.gd" id="24_nav"]
+[ext_resource type="Script" path="res://scripts/world/gate_trigger.gd" id="25_gate"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.5, 0.6, 0.8, 1)
@@ -195,6 +196,10 @@ script = ExtResource("18_trees")
 
 [node name="PlazaNPCs" type="Node3D" parent="."]
 script = ExtResource("22_npcs")
+
+[node name="GateTrigger" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 67, 0, 0)
+script = ExtResource("25_gate")
 
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1249246146]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 1, 0)

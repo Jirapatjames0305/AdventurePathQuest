@@ -6,6 +6,11 @@ extends Node
 const SCENE_RAVENFALL := "res://scenes/main.tscn"
 const SCENE_BLACKWOOD := "res://scenes/world/forest/blackwood.tscn"
 const SCENE_COMBAT := "res://scenes/combat/combat.tscn"
+const SCENE_WORLD_MAP := "res://scenes/world/world_map.tscn"
+
+## Where the hero appears when Ravenfall loads: "" = by the fountain,
+## "gate" = just inside the town gate (coming back from the world map).
+var town_entry := ""
 
 ## Created at declaration so scenes entering the tree before _ready can read it.
 var player_data := PlayerData.new()
@@ -25,8 +30,13 @@ func _ready() -> void:
 	])
 
 
-func goto_ravenfall() -> void:
+func goto_ravenfall(entry := "") -> void:
+	town_entry = entry
 	get_tree().change_scene_to_file(SCENE_RAVENFALL)
+
+
+func goto_world_map() -> void:
+	get_tree().change_scene_to_file(SCENE_WORLD_MAP)
 
 
 func goto_blackwood() -> void:

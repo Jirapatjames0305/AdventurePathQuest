@@ -61,7 +61,15 @@ func rest() -> void:
 
 func _on_rest_pressed() -> void:
 	GameManager.rest()
+	_heal_effect()
 	_refresh()
+
+
+## Green heal glow round the hero in town (V10).
+func _heal_effect() -> void:
+	var hero: Node3D = get_tree().get_first_node_in_group("player")
+	if hero:
+		Vfx.heal_glow(hero.get_parent(), hero.global_position - Vector3(0, 0.8, 0))
 
 
 func _refresh() -> void:
@@ -162,7 +170,8 @@ func _open_bag() -> void:
 
 
 func _on_use_potion_pressed(item: ItemData) -> void:
-	GameManager.player_data.use_potion(item.id)
+	if GameManager.player_data.use_potion(item.id):
+		_heal_effect()
 	_refresh()
 	_open_bag()
 

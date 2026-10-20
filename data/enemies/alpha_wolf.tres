@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+model = "alpha"
 display_name = "Alpha Wolf"
 emoji = "🐺👑"
 power = 90

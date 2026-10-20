@@ -143,7 +143,8 @@ func _on_quest(id: String) -> void:
 		QuestManager.State.AVAILABLE:
 			QuestManager.accept(id)
 		QuestManager.State.READY:
-			QuestManager.claim(id)
+			if QuestManager.claim(id) > 0:
+				Vfx.level_up(_player.get_parent(), _player.global_position - Vector3(0, 0.8, 0))
 	_refresh()
 
 

@@ -82,5 +82,5 @@ func play(anim_name: String) -> void:
 	if _anim.current_animation == anim_name and anim_name in LOOPING:
 		return
 	_anim.play(anim_name, BLEND_TIME)
-	if anim_name not in LOOPING:
+	if anim_name not in LOOPING and not anim_name.begins_with("Death"):
 		_anim.queue("Idle")

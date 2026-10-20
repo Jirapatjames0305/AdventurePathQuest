@@ -6,6 +6,8 @@ extends Control
 ## 4. Repeat until one side reaches 0 HP
 
 const TURN_DELAY := 0.7
+## Time from the attack animation starting to the blow landing.
+const IMPACT_DELAY := 0.22
 ## Damage per attack = Power × 10% (min 1). Tune here.
 const DAMAGE_FACTOR := 0.1
 
@@ -21,6 +23,7 @@ var _enemy_hp: int
 @onready var enemy_stats_label: Label = %EnemyStats
 @onready var battle_log: RichTextLabel = %BattleLog
 @onready var return_button: Button = %ReturnButton
+@onready var stage: CombatStage = %Stage
 
 
 func _ready() -> void:
@@ -31,8 +34,9 @@ func _ready() -> void:
 		GameManager.goto_ravenfall()
 		return
 	_enemy_hp = _enemy.max_hp
+	stage.setup(_player.character_id, _enemy)
 
-	player_name_label.text = "🧙 Hero"
+	player_name_label.text = "%s Hero" % CharacterModel.info(_player.character_id).emoji
 	enemy_name_label.text = "%s %s" % [_enemy.emoji, _enemy.display_name]
 	player_hp_bar.max_value = _player.max_hp
 	enemy_hp_bar.max_value = _enemy.max_hp
@@ -95,9 +99,14 @@ func _run_battle() -> void:
 
 
 func _player_attack() -> void:
-	await get_tree().create_timer(TURN_DELAY).timeout
+	await get_tree().create_timer(TURN_DELAY - IMPACT_DELAY).timeout
+	stage.hero_attack()
+	await get_tree().create_timer(IMPACT_DELAY).timeout
 	var dmg := _damage_of(_player.attack_power())
 	_enemy_hp = maxi(_enemy_hp - dmg, 0)
+	stage.enemy_hit(dmg)
+	if _enemy_hp <= 0:
+		stage.enemy_die()
 	_log("🗡️ Hero hits %s for [color=orange]%d[/color] damage!" % [_enemy.display_name, dmg])
 	if _enemy_hp <= 0:
 		_log("💀 %s is defeated — it cannot counterattack!" % _enemy.display_name)
@@ -105,9 +114,14 @@ func _player_attack() -> void:
 
 
 func _enemy_attack() -> void:
-	await get_tree().create_timer(TURN_DELAY).timeout
+	await get_tree().create_timer(TURN_DELAY - IMPACT_DELAY).timeout
+	stage.enemy_attack()
+	await get_tree().create_timer(IMPACT_DELAY).timeout
 	var dmg := _damage_of(_enemy.power)
 	_player.take_damage(dmg)
+	stage.hero_hit(dmg)
+	if not _player.is_alive():
+		stage.hero_die()
 	_log("🩸 %s hits Hero for [color=red]%d[/color] damage!" % [_enemy.display_name, dmg])
 	if not _player.is_alive():
 		_log("💀 Hero has fallen!")
@@ -117,6 +131,7 @@ func _enemy_attack() -> void:
 func _on_victory() -> void:
 	var reward := GameManager.apply_victory_rewards(_enemy)
 	MapManager.complete_current()
+	stage.victory(reward.level_ups)
 	_log("\n[b][color=gold]🏆 VICTORY![/color][/b]")
 	_log("✨ Reward: [color=orange]+%d Power[/color], [color=yellow]+%d Gold[/color], [color=cyan]+%d EXP[/color]" % [
 		reward.power, reward.gold, reward.exp

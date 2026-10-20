@@ -4,6 +4,8 @@ extends Resource
 
 @export var display_name: String = "Enemy"
 @export var emoji: String = "👾"
+## CreatureModel kind used on the Blackwood map and the combat stage.
+@export_enum("wolf", "alpha", "boar") var model: String = "wolf"
 @export var power: int = 10
 @export var max_hp: int = 30
 @export var speed: int = 20
