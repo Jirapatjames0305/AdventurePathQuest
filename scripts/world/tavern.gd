@@ -4,8 +4,9 @@ extends Node3D
 ## tavern rather than housing: a stone ground floor with a wide arched double
 ## door and big arched windows, a porch roof with lanterns, a large hanging
 ## sign with a foaming mug, outdoor tables with stools, stacked barrels, and a
-## smoking chimney. Upper floors are jettied timber framing with only a few
-## shuttered windows. Local +Z is the front (entrance).
+## smoking chimney. The storeys step in like tiers: each upper floor is
+## narrower than the one below, with a roof ledge at every step.
+## Local +Z is the front (entrance).
 
 const STONE := Color(0.58, 0.55, 0.5)
 const WALL := Color(0.94, 0.88, 0.74)
@@ -18,10 +19,10 @@ const FOAM := Color(0.98, 0.96, 0.9)
 const WINDOW_GLOW := Color(1.0, 0.72, 0.36)
 const FLOWERS := [Color(0.95, 0.35, 0.4), Color(0.98, 0.8, 0.3), Color(0.75, 0.45, 0.9)]
 
-const BASE := Vector3(12.0, 3.4, 9.0)
+const BASE := Vector3(13.0, 3.4, 9.5)
 const FLOOR_HEIGHT := 3.0
-## Each upper floor sticks out this much further on the front and back.
-const JETTY := 0.5
+## Footprint (x = width, z = depth) of floor 2 and floor 3.
+const UPPER_FLOORS := [Vector2(10.0, 7.5), Vector2(7.0, 5.5)]
 const ROOF_HEIGHT := 4.5
 const PORCH_DEPTH := 2.6
 
@@ -32,12 +33,13 @@ func _ready() -> void:
 	_box(Vector3(BASE.x + 0.4, 0.3, BASE.z + 0.4), "stone", Vector3(0, 0.15, 0))
 	_box(BASE, "stone", Vector3(0, 0.3 + BASE.y / 2.0, 0))
 	var top := 0.3 + BASE.y
-	var depth := BASE.z
-	for floor_index in 2:
-		depth += JETTY * 2.0
-		_upper_floor(top, depth)
+	var below := Vector2(BASE.x, BASE.z)
+	for size: Vector2 in UPPER_FLOORS:
+		_ledge(top, below)
+		_upper_floor(top, size)
+		below = size
 		top += FLOOR_HEIGHT
-	_roof(top, depth)
+	_roof(top, below)
 	_ground_floor()
 	_porch()
 	_sign()
@@ -67,37 +69,44 @@ func _arch_opening(base: Vector3, width: float, height: float, key: String) -> v
 	arch.position = base + Vector3(0, height, 0.05)
 
 
-## One jettied timber-framed storey with a few shuttered, flower-boxed windows.
-func _upper_floor(bottom: float, depth: float) -> void:
+## Sloped roof skirt on the exposed top of the floor below a step-in.
+func _ledge(top: float, below: Vector2) -> void:
+	_box(Vector3(below.x + 0.5, 0.3, below.y + 0.5), "roof", Vector3(0, top + 0.15, 0))
+	_box(Vector3(below.x + 0.6, 0.12, below.y + 0.6), "beam", Vector3(0, top - 0.02, 0))
+
+
+## One timber-framed storey with a few shuttered, flower-boxed windows.
+func _upper_floor(bottom: float, size: Vector2) -> void:
 	var y := bottom + FLOOR_HEIGHT / 2.0
-	_box(Vector3(BASE.x, FLOOR_HEIGHT, depth), "wall", Vector3(0, y, 0))
-	var half_z := depth / 2.0
-	_box(Vector3(BASE.x + 0.2, 0.28, depth + 0.2), "beam", Vector3(0, bottom + 0.14, 0))
-	for x in [-6.0, -2.0, 2.0, 6.0]:
-		for z in [-half_z, half_z]:
+	var half := size / 2.0
+	_box(Vector3(size.x, FLOOR_HEIGHT, size.y), "wall", Vector3(0, y, 0))
+	_box(Vector3(size.x + 0.2, 0.28, size.y + 0.2), "beam", Vector3(0, bottom + 0.42, 0))
+	for x in [-half.x, -half.x / 3.0, half.x / 3.0, half.x]:
+		for z in [-half.y, half.y]:
 			_box(Vector3(0.22, FLOOR_HEIGHT, 0.22), "beam", Vector3(x, y, z))
-	for z in [-half_z, half_z]:
-		for x in [-4.0, 4.0]:
-			var brace := _box(Vector3(0.16, FLOOR_HEIGHT * 1.2, 0.18), "beam", Vector3(x, y, z))
-			brace.rotation.z = deg_to_rad(38.0 if x < 0 else -38.0)
-		_window(Vector3(0, bottom + 1.5, z), Vector3(0, 0, signf(z)), true)
+	for z in [-half.y, half.y]:
+		for x in [-half.x * 2.0 / 3.0, half.x * 2.0 / 3.0]:
+			var brace := _box(Vector3(0.16, FLOOR_HEIGHT * 1.15, 0.18), "beam", Vector3(x, y, z))
+			brace.rotation.z = deg_to_rad(36.0 if x < 0 else -36.0)
+		_window(Vector3(0, bottom + 1.6, z), Vector3(0, 0, signf(z)), true)
 	for side in [-1.0, 1.0]:
-		_window(Vector3(side * BASE.x / 2.0, bottom + 1.5, 0), Vector3(side, 0, 0), true)
+		_window(Vector3(side * half.x, bottom + 1.6, 0), Vector3(side, 0, 0), true)
 
 
-func _roof(bottom: float, depth: float) -> void:
+func _roof(bottom: float, top_floor: Vector2) -> void:
 	var roof := PrismMesh.new()
-	roof.size = Vector3(depth + 1.2, ROOF_HEIGHT, BASE.x + 1.0)
+	roof.size = Vector3(top_floor.y + 1.2, ROOF_HEIGHT, top_floor.x + 1.0)
 	var node := _mesh(roof, "roof", Vector3(0, bottom + ROOF_HEIGHT / 2.0, 0))
 	node.rotation.y = PI / 2.0
-	# One big central dormer on the front slope.
+	# One central dormer on the front slope.
+	var depth := top_floor.y
 	var at := Vector3(0, bottom + 1.3, depth / 4.0 + 0.2)
 	_box(Vector3(2.2, 1.8, 1.6), "wall", at)
 	var cap := PrismMesh.new()
 	cap.size = Vector3(2.6, 1.0, 1.8)
 	_mesh(cap, "roof", at + Vector3(0, 1.4, 0))
 	_box(Vector3(1.2, 1.0, 0.1), "window", at + Vector3(0, 0.0, 0.82))
-	var chimney := Vector3(4.6, bottom + ROOF_HEIGHT - 0.4, -1.2)
+	var chimney := Vector3(top_floor.x / 2.0 - 1.0, bottom + ROOF_HEIGHT - 0.4, -1.0)
 	_box(Vector3(1.2, 3.4, 1.2), "stone", chimney)
 	add_child(_smoke(chimney + Vector3.UP * 1.9))
 
@@ -107,7 +116,7 @@ func _porch() -> void:
 	var front := BASE.z / 2.0
 	var roof := _box(Vector3(BASE.x - 0.6, 0.18, PORCH_DEPTH + 0.4), "roof", Vector3(0, 0.3 + 3.25, front + PORCH_DEPTH / 2.0))
 	roof.rotation.x = deg_to_rad(14.0)
-	for x in [-5.4, -1.8, 1.8, 5.4]:
+	for x in [-5.9, -1.8, 1.8, 5.9]:
 		_box(Vector3(0.24, 3.0, 0.24), "beam", Vector3(x, 0.3 + 1.5, front + PORCH_DEPTH - 0.1))
 	for x in [-1.8, 1.8]:
 		var lamp := Vector3(x, 0.3 + 2.55, front + PORCH_DEPTH - 0.1)
@@ -123,8 +132,8 @@ func _porch() -> void:
 
 ## Big sign board on an iron bracket off the front corner, with a foaming mug.
 func _sign() -> void:
-	var front := BASE.z / 2.0
-	var anchor := Vector3(BASE.x / 2.0 - 0.3, 0.3 + BASE.y + 1.6, front + JETTY)
+	var floor2: Vector2 = UPPER_FLOORS[0]
+	var anchor := Vector3(floor2.x / 2.0 - 0.3, 0.3 + BASE.y + 2.0, floor2.y / 2.0)
 	_box(Vector3(0.12, 0.12, 2.0), "iron", anchor + Vector3(0, 0, 1.0))
 	for z in [0.5, 1.6]:
 		_box(Vector3(0.03, 0.5, 0.03), "iron", anchor + Vector3(0, -0.25, z))
