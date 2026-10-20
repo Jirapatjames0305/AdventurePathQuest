@@ -18,7 +18,7 @@ const BASIN_HEIGHT := 0.75
 ## Each entry: [angle° around the fountain, awning colour, goods].
 const STALL_RADIUS := 11.8
 ## Extra turn for every stall (counter-clockwise seen from above = to the left).
-const STALL_TURN_DEGREES := 15.0
+const STALL_TURN_DEGREES := 30.0
 const STALLS := [
 	[158.0, Color(0.85, 0.3, 0.28), MarketStall.Goods.FRUIT],
 	[180.0, Color(0.3, 0.5, 0.85), MarketStall.Goods.CLOTH],
