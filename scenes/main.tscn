@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://3w20u2hei300" path="res://scripts/player/player.gd" id="1_player"]
 [ext_resource type="Script" uid="uid://cn3q60t01bw0u" path="res://scripts/world/camera_rig.gd" id="2_camrig"]
 [ext_resource type="Script" path="res://scripts/ui/ravenfall_ui.gd" id="3_ui"]
+[ext_resource type="Script" path="res://scripts/characters/character_model.gd" id="4_model"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.4, 0.6, 0.85, 1)
@@ -35,13 +36,6 @@ size = Vector3(1.2, 1.2, 1.2)
 
 [sub_resource type="StandardMaterial3D" id="PropMat"]
 albedo_color = Color(0.55, 0.42, 0.3, 1)
-
-[sub_resource type="CapsuleMesh" id="PlayerMesh"]
-radius = 0.4
-height = 1.6
-
-[sub_resource type="StandardMaterial3D" id="PlayerMat"]
-albedo_color = Color(0.93, 0.55, 0.35, 1)
 
 [sub_resource type="CapsuleShape3D" id="PlayerShape"]
 radius = 0.4
@@ -89,9 +83,9 @@ surface_material_override/0 = SubResource("PropMat")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("1_player")
 
-[node name="PlayerMesh" type="MeshInstance3D" parent="Player" unique_id=763129293]
-mesh = SubResource("PlayerMesh")
-surface_material_override/0 = SubResource("PlayerMat")
+[node name="Model" type="Node3D" parent="Player"]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, -0.8, 0)
+script = ExtResource("4_model")
 
 [node name="PlayerCollision" type="CollisionShape3D" parent="Player" unique_id=1364291242]
 shape = SubResource("PlayerShape")

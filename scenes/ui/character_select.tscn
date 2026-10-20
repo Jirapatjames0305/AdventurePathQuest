@@ -1,0 +1,120 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/character_select.gd" id="1_cs"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
+sky_top_color = Color(0.36, 0.52, 0.82, 1)
+sky_horizon_color = Color(0.93, 0.8, 0.66, 1)
+ground_bottom_color = Color(0.22, 0.3, 0.22, 1)
+ground_horizon_color = Color(0.93, 0.8, 0.66, 1)
+
+[sub_resource type="Sky" id="Sky"]
+sky_material = SubResource("SkyMat")
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 2
+sky = SubResource("Sky")
+ambient_light_source = 3
+tonemap_mode = 2
+ssao_enabled = true
+
+[sub_resource type="CylinderMesh" id="StageMesh"]
+top_radius = 6.0
+bottom_radius = 6.2
+height = 0.3
+
+[sub_resource type="StandardMaterial3D" id="StageMat"]
+albedo_color = Color(0.45, 0.66, 0.4, 1)
+roughness = 0.9
+
+[sub_resource type="CylinderMesh" id="RingMesh"]
+top_radius = 0.75
+bottom_radius = 0.75
+height = 0.04
+
+[sub_resource type="StandardMaterial3D" id="RingMat"]
+albedo_color = Color(1, 0.82, 0.35, 1)
+emission_enabled = true
+emission = Color(1, 0.75, 0.25, 1)
+emission_energy_multiplier = 1.5
+
+[node name="CharacterSelect" type="Node3D"]
+script = ExtResource("1_cs")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8192, 0.4699, -0.329, 0, 0.5736, 0.8192, 0.5736, -0.6711, 0.4699, 0, 12, 0)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9848, 0.1736, 0, -0.1736, 0.9848, 0, 2.6, 8.5)
+fov = 50.0
+
+[node name="Stage" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
+mesh = SubResource("StageMesh")
+surface_material_override/0 = SubResource("StageMat")
+
+[node name="Ring" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("RingMesh")
+surface_material_override/0 = SubResource("RingMat")
+
+[node name="Lineup" type="Node3D" parent="."]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Title" type="Label" parent="UI"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 40.0
+offset_bottom = 110.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 48
+text = "⚔️ Choose Your Hero"
+horizontal_alignment = 1
+
+[node name="Bottom" type="VBoxContainer" parent="UI"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -300.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 14
+
+[node name="NameLabel" type="Label" parent="UI/Bottom"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Name"
+horizontal_alignment = 1
+
+[node name="BlurbLabel" type="Label" parent="UI/Bottom"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Blurb"
+horizontal_alignment = 1
+
+[node name="ChoiceBar" type="HBoxContainer" parent="UI/Bottom"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="StartRow" type="HBoxContainer" parent="UI/Bottom"]
+layout_mode = 2
+alignment = 1
+
+[node name="StartButton" type="Button" parent="UI/Bottom/StartRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "🌟 Start Adventure"

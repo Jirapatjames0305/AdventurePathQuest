@@ -6,6 +6,8 @@ const LEVEL_UP_HP := 20
 const LEVEL_UP_POWER := 10
 const LEVEL_UP_SPEED := 2
 
+## CharacterModel id chosen on the character select screen.
+@export var character_id: String = "knight"
 @export var level: int = 1
 @export var power: int = 100
 @export var hp: int = 100

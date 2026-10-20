@@ -6,6 +6,13 @@ extends CharacterBody3D
 const MOVE_SPEED := 6.0
 const CAMERA_YAW_DEGREES := 45.0
 
+@onready var model: CharacterModel = $Model
+
+
+func _enter_tree() -> void:
+	# Set before Model's _ready so it loads the chosen hero only once.
+	$Model.character_id = GameManager.player_data.character_id
+
 
 func _physics_process(delta: float) -> void:
 	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
@@ -23,6 +30,8 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-	if direction.length_squared() > 0.001:
+	var moving := direction.length_squared() > 0.001
+	model.play("Running_A" if moving else "Idle")
+	if moving:
 		var target_yaw := atan2(direction.x, direction.z)
 		rotation.y = lerp_angle(rotation.y, target_yaw, 0.2)
