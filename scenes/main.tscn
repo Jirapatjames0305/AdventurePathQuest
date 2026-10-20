@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://scripts/ui/ravenfall_ui.gd" id="3_ui"]
 [ext_resource type="Script" path="res://scripts/characters/character_model.gd" id="4_model"]
 [ext_resource type="Script" path="res://scripts/world/town_square.gd" id="5_square"]
+[ext_resource type="Script" path="res://scripts/world/guild_hall.gd" id="6_guild"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.5, 0.6, 0.8, 1)
@@ -37,10 +38,10 @@ adjustment_enabled = true
 adjustment_saturation = 1.05
 
 [sub_resource type="BoxShape3D" id="FloorShape"]
-size = Vector3(60, 0.2, 60)
+size = Vector3(120, 0.2, 120)
 
 [sub_resource type="PlaneMesh" id="FloorMesh"]
-size = Vector2(60, 60)
+size = Vector2(120, 120)
 
 [sub_resource type="StandardMaterial3D" id="FloorMat"]
 albedo_color = Color(0.45, 0.65, 0.35, 1)
@@ -75,6 +76,10 @@ shape = SubResource("FloorShape")
 
 [node name="TownSquare" type="Node3D" parent="."]
 script = ExtResource("5_square")
+
+[node name="GuildHall" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -24.6)
+script = ExtResource("6_guild")
 
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1249246146]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 1, 3.2)
