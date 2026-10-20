@@ -19,10 +19,10 @@ const PATHS := [
 	[Vector3(-18, 0, 24), Vector3(-18, 0, 0), Vector3(-15, 0, 0)],
 	[Vector3(-27, 0, 21), Vector3(-18, 0, 21)],
 	[Vector3(15, 0, 0), Vector3(28, 0, 0)],
-	[Vector3(0, 0, -11), Vector3(0, 0, -25)],
 ]
-## World-space boxes (x, z min/max) kept clear of trees: plaza square, church.
-const KEEP_CLEAR := [Rect2(-17, -17, 34, 34), Rect2(-8, -48, 12, 28)]
+## World-space boxes (x, z min/max) kept clear of trees: plaza square, church,
+## and everything beyond the town wall behind the church (z < -53).
+const KEEP_CLEAR := [Rect2(-17, -17, 34, 34), Rect2(-8, -48, 12, 28), Rect2(-200, -400, 400, 347)]
 const SEED := 4242
 
 const STONE := Color(0.7, 0.68, 0.63)

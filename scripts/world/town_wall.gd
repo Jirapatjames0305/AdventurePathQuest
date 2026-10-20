@@ -9,7 +9,7 @@ extends Node3D
 const STONE_SHADER := preload("res://shaders/stone_wall.gdshader")
 
 ## Wall line as a rectangle in world X/Z: position = (min x, min z).
-const BOUNDS := Rect2(-52, -72, 114, 128)
+const BOUNDS := Rect2(-52, -55, 114, 111)
 const HEIGHT := 5.0
 const THICKNESS := 1.6
 const MERLON := Vector3(0.9, 0.8, 0.5)
