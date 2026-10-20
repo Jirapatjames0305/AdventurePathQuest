@@ -80,6 +80,21 @@ The old gate trigger that opened the world map is gone; walking out of the gate 
 | ⬜ OW5 | **Boss & treasure:** Alpha Wolf lair with its unlock rule, boss attack pattern, world chests opened with F | Boss fight works; chests give their rewards once |
 | ⬜ OW6 | **Clean-up:** remove the combat scene, node map logic and world-map travel that no longer apply; update tests to the new loop | Old turn-based code is gone; tests cover the real-time loop |
 
+### Reference games (2026-10-20): Genshin, Yulgang, Ragnarok, Cabal
+
+After seeing OW1, the user said it doesn't yet feel like an open world. The games they named are the target feel. Nothing has been changed yet; this is a note for the next session.
+
+What these games share, and what THE FRONTIER is still missing:
+- **A world of zones:** several fields, forests and caves around the town. Monster level rises with distance from town, and each zone feels different (terrain, colour, monsters). Today there is one flat square forest with invisible walls.
+- **Natural terrain:** hills, rivers, cliffs and mountains as borders instead of invisible walls.
+- **Living monsters:** they wander, some aggro, they respawn after dying, and they show a name and level overhead.
+- **MMORPG HUD:** HP/MP/EXP bars, a skill hotbar (1–9), loot dropped on the ground to pick up.
+- **Farming loop:** go out, level up, return to town to buy or upgrade, then go out again.
+
+Undecided; ask the user before building:
+1. **World structure:** zones linked by edge warps/portals (Ragnarok/Yulgang/Cabal, lighter, easy to add zones) or one seamless world with streaming (Genshin, much more work)?
+2. **Combat control:** click a monster to auto-attack plus skill hotkeys 1–9 (Ragnarok/Yulgang) or direct action with WASD, attack button and dodge (Genshin/Cabal)? The earlier choice "real-time action on the map" fits either.
+
 ### Open questions
 
 - Keep the painted world map as a **fast-travel / overview** screen (e.g. on M), or remove it?
