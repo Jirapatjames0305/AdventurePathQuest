@@ -14,10 +14,9 @@ const LOOP_RADII := Vector2(15.0, 11.0)
 const POND_RADII := Vector2(9.0, 6.0)
 const PATH_WIDTH := 2.8
 ## Footpaths besides the loop, in local coords (straight segments, square corners).
-## The first joins the plaza square's edge; the second the church path.
+## The first joins the plaza square's edge.
 const PATHS := [
 	[Vector3(-18, 0, 24), Vector3(-18, 0, 0), Vector3(-15, 0, 0)],
-	[Vector3(-27, 0, 21), Vector3(-18, 0, 21)],
 	[Vector3(15, 0, 0), Vector3(28, 0, 0)],
 ]
 ## World-space boxes (x, z min/max) kept clear of trees: plaza square, church,
