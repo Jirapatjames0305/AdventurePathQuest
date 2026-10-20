@@ -28,6 +28,7 @@ everything at once.
 | Format | glTF (`.gltf` + `.bin`, or `.glb`) |
 | Scale rule | Hex pack ×2.5 (one tile = 5 units across; tavern ≈ 3.5 tall). Characters ×0.7 (≈ 1.7 tall, matches the current player capsule) |
 | Import rule | Copy only the models we use into `assets/`. Never the whole pack (the full packs are ~240 MB) |
+| Ravenfall reference | [`docs/reference/ravenfall_golden_town.png`](reference/ravenfall_golden_town.png): a walled town in golden-hour light (supplied by the user) |
 | Not in packs yet | Wolves / boar (Blackwood enemies). Choose the source in V8 (candidate: Quaternius animal packs, also CC0) |
 
 ### Steps
@@ -41,6 +42,7 @@ Each step has a **goal**, a **change**, and a **done check**. ⬜ = not started,
 | ✅ V3 (2026-10-20) | **Town buildings** | Red-roof buildings around the square, following README §9: Tavern (Rest), Market (Potion Shop), Blacksmith, a well, Old Chapel, Abandoned House, 3 homes, a windmill. Each one faces the square and has a cylinder collider | Screenshot: each shop has a matching building |
 | ✅ V4 (2026-10-20) | **Nature & props** | Rings by distance: scattered single trees and rocks on the walkable edge (with colliders) → forest → hills → mountains (fixed seed so the layout is the same every visit). The road leaves a gap through the forest as the Blackwood entrance. Barrels, crates, sacks, flags and a weapon rack are placed by hand (props ×6 to match the hero). The 3 grey crates are gone | Screenshot: the town feels "cosy" and the edges are hidden |
 | ✅ V5 (2026-10-20) | **Light & mood** | Warm sun with soft shadows, a sky with a warm horizon, ACES tonemap, light fog, faint glow, stronger SSAO. Ground tiles are tinted greener (`GRASS_TINT`), and road tiles get a milder tint so the path keeps its sandy colour (the pack's grass turns yellow under warm light) | Before/after screenshots compared side by side |
+| ✅ V5b (2026-10-20) | **Ravenfall big town (from reference)** | Rebuilt the town to match the reference image: hex wall ring 6 (corners + gate + 5 blue-cone towers), paved plaza with a well in the middle and market stalls, paved main street from the gate up to the manor (castle), blue-roof buildings ×1.5 (cathedral, tavern, blacksmith, market, mage tower, barracks, 20 homes), a garden pond, a river and road bridge outside the gate, wheat fields and a windmill top-right, then forest and hills out to ring 10. Low golden-hour sun with long shadows; camera size 18 | Overview and gameplay screenshots look close to the reference |
 | ⬜ V6 | **UI theme** | One project-wide Godot Theme: rounded font (Fredoka, OFL), parchment-coloured panels, wood/gold buttons. This changes every screen at once without touching layouts | Screenshots of Ravenfall, Blackwood and Combat with the theme |
 | ⬜ V7 | **Walk-up interaction** *(optional)* | Walking to a building opens its shop. The bottom buttons stay as a shortcut | Walk to the blacksmith and the shop opens |
 | ⬜ V8 | **Blackwood map look** | Pick the enemy model source, then turn the enemy list into a forest map with nodes (ties into Phase 3 maps) | Screenshot of the Blackwood map |
