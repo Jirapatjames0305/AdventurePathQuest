@@ -2,16 +2,17 @@ class_name MapGrid
 extends Node3D
 ## Design aid: a lat/long grid on the ground plus a compass and the hero's
 ## current coordinates, so map positions can be described exactly.
-## Directions follow the screen (isometric camera yaw 45°):
-##   North = up the screen, East = right on the screen.
+## Directions follow the town layout (buildings, roads and the plaza square
+## are aligned to the world axes), so the compass is diagonal on screen:
+##   North = up-left, East = up-right, South = down-right, West = down-left.
 ## Origin (lat 0, long 0) is the town fountain; 1 unit = 1 world metre.
 ## Press G to toggle the grid, P to mark the hero's current spot.
 ## The hero's live position is written to user://player_position.txt and
 ## every mark is appended to user://map_marks.txt (and printed as [MARK]).
 
-## World directions that appear as straight up / right on screen.
-const NORTH := Vector3(-0.70710678, 0.0, -0.70710678)
-const EAST := Vector3(0.70710678, 0.0, -0.70710678)
+## World directions for North and East (aligned with the town's world axes).
+const NORTH := Vector3(-1.0, 0.0, 0.0)
+const EAST := Vector3(0.0, 0.0, -1.0)
 
 const EXTENT := 60
 const LINE_STEP := 5
@@ -137,20 +138,26 @@ func _build_hud() -> void:
 	hud.layer = 10
 	add_child(hud)
 
-	var compass := Label.new()
-	compass.text = "N\nW  ✛  E\nS"
-	compass.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	compass.add_theme_font_size_override("font_size", 34)
-	compass.add_theme_color_override("font_color", Color.WHITE)
-	compass.add_theme_color_override("font_outline_color", Color.BLACK)
-	compass.add_theme_constant_override("outline_size", 10)
+	# Diagonal compass (top-right): letters sit where each direction points on screen.
+	var compass := Control.new()
 	compass.anchor_left = 1.0
 	compass.anchor_right = 1.0
-	compass.offset_left = -190.0
-	compass.offset_right = -40.0
-	compass.offset_top = 30.0
-	compass.offset_bottom = 190.0
+	compass.offset_left = -180.0
+	compass.offset_top = 20.0
 	hud.add_child(compass)
+	var center := Vector2(80, 80)
+	for entry in [["N", Vector2(-1, -1)], ["E", Vector2(1, -1)], ["S", Vector2(1, 1)], ["W", Vector2(-1, 1)], ["✛", Vector2.ZERO]]:
+		var letter := Label.new()
+		letter.text = entry[0]
+		letter.add_theme_font_size_override("font_size", 34 if entry[0] != "N" else 40)
+		letter.add_theme_color_override("font_color", Color(1.0, 0.4, 0.35) if entry[0] == "N" else Color.WHITE)
+		letter.add_theme_color_override("font_outline_color", Color.BLACK)
+		letter.add_theme_constant_override("outline_size", 10)
+		letter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		letter.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		letter.size = Vector2(50, 50)
+		letter.position = center + entry[1] * 48.0 - letter.size / 2.0
+		compass.add_child(letter)
 
 	_readout = Label.new()
 	_readout.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -166,7 +173,7 @@ func _build_hud() -> void:
 	hud.add_child(_readout)
 
 	var legend := Label.new()
-	legend.text = "lat + = North (up)   long + = East (right)   0,0 = fountain   G = grid on/off   P = mark spot"
+	legend.text = "lat + = North (up-left)   long + = East (up-right)   0,0 = fountain   G = grid on/off   P = mark spot"
 	legend.add_theme_font_size_override("font_size", 18)
 	legend.add_theme_color_override("font_color", Color.WHITE)
 	legend.add_theme_color_override("font_outline_color", Color.BLACK)
