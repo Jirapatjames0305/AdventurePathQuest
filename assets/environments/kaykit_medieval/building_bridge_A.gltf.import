@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://4yfcgc4mgj3x"
-path="res://.godot/imported/hills_C_trees.gltf-4e66dddc4fb72a9f539fdaeaf2b38fa4.scn"
+uid="uid://cb3ix75odx3lg"
+path="res://.godot/imported/building_bridge_A.gltf-60bb8aa016a249e998948bb05417818b.scn"
 
 [deps]
 
-source_file="res://assets/environments/kaykit_medieval/hills_C_trees.gltf"
-dest_files=["res://.godot/imported/hills_C_trees.gltf-4e66dddc4fb72a9f539fdaeaf2b38fa4.scn"]
+source_file="res://assets/environments/kaykit_medieval/building_bridge_A.gltf"
+dest_files=["res://.godot/imported/building_bridge_A.gltf-60bb8aa016a249e998948bb05417818b.scn"]
 
 [params]
 

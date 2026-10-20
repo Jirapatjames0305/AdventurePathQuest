@@ -3,8 +3,9 @@ extends Node3D
 ## Builds Ravenfall from KayKit Medieval Hexagon tiles (CC0) using a data layout.
 ## Visual target: docs/reference/ravenfall_golden_town.png — a walled town with a
 ## paved plaza, main street to a manor, cathedral, river and fields outside.
-## Tiles use pointy-top axial coords (q, r); the hex pack is scaled ×2.5 so
-## one tile is 5 units across and buildings sit at chibi-hero scale.
+## Layout uses pointy-top hex axial coords (q, r) as a placement grid (5 units
+## per cell; the hex pack is scaled ×2.5), but the ground itself is one smooth
+## terrain — no visible hex tiles.
 ## Screen directions (after ROAD_ALIGN): (0, -1) = up, (0, 1) = down,
 ## (1, 0) = right-down, (1, -1) = right-up, (-1, 0) = left-up, (-1, 1) = left-down.
 
@@ -18,8 +19,9 @@ const ROAD_ALIGN_DEGREES := 15.0
 
 ## The town wall sits on this ring; everything inside is walkable town.
 const WALL_RING := 6
-## Ground is laid this far out so the camera never sees the island's edge.
+## Nature is placed out to this ring; the terrain is larger still.
 const GROUND_RINGS := 10
+const TERRAIN_SIZE := 300.0
 ## Invisible boundary just inside the wall (its sides are ~26 units out).
 const WALK_RADIUS := 24.5
 const WALL_SEGMENTS := 32
@@ -30,12 +32,21 @@ const BUILDING_SCALE := 1.5
 ## Hex-pack props (barrels, crates…) are modelled at map scale; this makes
 ## them hero-sized.
 const PROP_SCALE := 6.0
-## The pack's grass is quite yellow under warm light; tint ground tiles greener.
-const GRASS_TINT := Color(0.72, 0.95, 0.62)
-## Road tiles get a milder tint so the dirt path keeps its sandy colour.
-const ROAD_TINT := Color(0.9, 0.98, 0.84)
-## Plaza and main street are paved with plain stone-coloured tiles.
-const PAVING_COLOR := Color(0.78, 0.72, 0.62)
+## Terrain colours; each surface blends two shades with soft noise.
+const GRASS_COLORS := [Color(0.42, 0.62, 0.27), Color(0.6, 0.76, 0.33)]
+const PAVING_COLORS := [Color(0.66, 0.6, 0.52), Color(0.8, 0.74, 0.64)]
+const DIRT_COLORS := [Color(0.62, 0.5, 0.36), Color(0.76, 0.64, 0.46)]
+const BANK_COLORS := [Color(0.74, 0.68, 0.5), Color(0.84, 0.78, 0.6)]
+const FIELD_COLORS := [Color(0.86, 0.7, 0.3), Color(0.95, 0.82, 0.42)]
+const WATER_COLOR := Color(0.24, 0.52, 0.78)
+## How many world units one noise texture repeat covers.
+const NOISE_TILE := 24.0
+const PLAZA_RADIUS := 8.5
+const STREET_WIDTH := 4.5
+const ROAD_WIDTH := 3.5
+const RIVER_WIDTH := 4.5
+const BANK_WIDTH := 6.5
+const FIELD_SIZE := Vector2(4.4, 3.8)
 ## Fixed seed so the scattered nature looks the same every visit.
 const NATURE_SEED := 20261020
 
@@ -48,7 +59,7 @@ const DIRS := [
 ## Main street: paved from the manor (top) through the plaza to the gate (bottom).
 const STREET_FROM := -3
 const STREET_TO := 5
-## Dirt road outside the gate, crossing the river on a bridge tile.
+## Dirt road outside the gate, crossing the river on a bridge.
 const OUTER_ROAD_TO := GROUND_RINGS
 const RIVER_ROW := 8
 
@@ -109,7 +120,6 @@ const TREE_RADIUS := 0.7
 const OUTSKIRT_SCATTER := ["tree_single_A", "tree_single_B", "rock_single_A", "rock_single_B", "rock_single_C"]
 const OUTSKIRT_SCATTER_CHANCE := 0.5
 const FOREST := ["trees_A_large", "trees_A_medium", "trees_B_large", "trees_B_medium"]
-const HILLS := ["hills_A_trees", "hills_B_trees", "hills_C_trees", "trees_B_large"]
 
 ## Hand-placed props. Each entry: [q, r, model, offset (x, z) from tile center, y rotation°].
 const PROPS := [
@@ -139,12 +149,7 @@ const PROPS := [
 	[5, -9, "sack", Vector2(-1.2, 2.0), 0.0],
 ]
 
-var _grass_material: Material
-var _road_material: Material
-var _paving_material: StandardMaterial3D
-## Ground overrides: Vector2i -> [tile model, y rotation°, material kind].
-var _ground := {}
-## Tiles where nature must not grow.
+## Cells where nature must not grow.
 var _occupied := {}
 var _colliders: StaticBody3D
 
@@ -155,7 +160,7 @@ func _ready() -> void:
 	_colliders.name = "Colliders"
 	add_child(_colliders)
 	_plan_ground()
-	_build_ground()
+	_build_terrain()
 	_build_town_wall()
 	_build_buildings()
 	_build_nature()
@@ -202,56 +207,108 @@ func _add_cylinder_collider(at: Vector3, radius: float) -> void:
 
 
 func _plan_ground() -> void:
-	# Plaza: the center tile and its ring.
-	_ground[Vector2i.ZERO] = ["hex_grass", 0.0, "paving"]
+	_occupied[Vector2i.ZERO] = true
 	for dir in DIRS:
-		_ground[dir] = ["hex_grass", 0.0, "paving"]
-	# Main street (paved), gate tile (dirt road under the gate arch).
-	for r in range(STREET_FROM, STREET_TO + 1):
-		_ground[Vector2i(0, r)] = ["hex_grass", 0.0, "paving"]
-	# Dirt road out of the gate, bridging the river.
-	for r in range(WALL_RING, OUTER_ROAD_TO + 1):
-		_ground[Vector2i(0, r)] = ["hex_road_A", -60.0, "road"]
-	# River across the bottom, outside the walls.
+		_occupied[dir] = true
+	for r in range(STREET_FROM, GROUND_RINGS + 1):
+		_occupied[Vector2i(0, r)] = true
 	for q in range(-GROUND_RINGS, GROUND_RINGS + 1):
-		if hex_distance(q, RIVER_ROW) <= GROUND_RINGS:
-			_ground[Vector2i(q, RIVER_ROW)] = ["hex_river_A", 0.0, "water"]
-	_ground[Vector2i(0, RIVER_ROW)] = ["hex_river_crossing_A", 0.0, "road"]
-	for pond in PONDS:
-		_ground[pond] = ["hex_water", 0.0, "water"]
-	for coord in _ground:
-		_occupied[coord] = true
-	for field in FIELDS:
-		_occupied[field] = true
+		_occupied[Vector2i(q, RIVER_ROW)] = true
+	for cell in PONDS + FIELDS:
+		_occupied[cell] = true
 	_occupied[WINDMILL] = true
 
 
-func _build_ground() -> void:
-	_paving_material = StandardMaterial3D.new()
-	_paving_material.albedo_color = PAVING_COLOR
-	_paving_material.roughness = 1.0
-	for q in range(-GROUND_RINGS, GROUND_RINGS + 1):
-		for r in range(-GROUND_RINGS, GROUND_RINGS + 1):
-			if hex_distance(q, r) > GROUND_RINGS:
-				continue
-			var plan: Array = _ground.get(Vector2i(q, r), ["hex_grass", 0.0, "grass"])
-			var tile := _place(plan[0], q, r, plan[1])
-			var mesh: MeshInstance3D = tile.find_children("*", "MeshInstance3D")[0]
-			if not _grass_material:
-				_grass_material = mesh.mesh.surface_get_material(0).duplicate()
-				_grass_material.albedo_color = GRASS_TINT
-				_road_material = _grass_material.duplicate()
-				_road_material.albedo_color = ROAD_TINT
-			match plan[2]:
-				"grass":
-					mesh.material_override = _grass_material
-				"road":
-					mesh.material_override = _road_material
-				"paving":
-					mesh.material_override = _paving_material
-	for field in FIELDS:
-		_place("building_grain", field.x, field.y)
+## One smooth terrain with flat overlays for plaza, streets, river, pond, fields.
+func _build_terrain() -> void:
+	var ground := MeshInstance3D.new()
+	var plane := PlaneMesh.new()
+	plane.size = Vector2.ONE * TERRAIN_SIZE
+	ground.mesh = plane
+	ground.material_override = _noise_material(GRASS_COLORS, NOISE_TILE * 2.0)
+	add_child(ground)
+
+	var paving := _noise_material(PAVING_COLORS, NOISE_TILE)
+	_disc(Vector3.ZERO, PLAZA_RADIUS, paving, 0.03)
+	_strip(axial_to_world(0, STREET_FROM), axial_to_world(0, WALL_RING), STREET_WIDTH, paving, 0.02)
+	_strip(axial_to_world(0, WALL_RING), axial_to_world(0, GROUND_RINGS + 4), ROAD_WIDTH, _noise_material(DIRT_COLORS, NOISE_TILE), 0.015)
+
+	var water := StandardMaterial3D.new()
+	water.albedo_color = WATER_COLOR
+	water.roughness = 0.15
+	water.metallic = 0.2
+	var bank := _noise_material(BANK_COLORS, NOISE_TILE)
+	var river_from := axial_to_world(-GROUND_RINGS - 6, RIVER_ROW)
+	var river_to := axial_to_world(GROUND_RINGS, RIVER_ROW)
+	_strip(river_from, river_to, BANK_WIDTH, bank, 0.01)
+	_strip(river_from, river_to, RIVER_WIDTH, water, 0.025)
+	var bridge := _place("building_bridge_A", 0, RIVER_ROW, 30.0)
+	bridge.scale = Vector3.ONE * 3.0
+
+	var pond_center := (axial_to_world(PONDS[0].x, PONDS[0].y) + axial_to_world(PONDS[1].x, PONDS[1].y)) / 2.0
+	_disc(pond_center, 4.0, bank, 0.01).scale.x = 1.7
+	_disc(pond_center, 3.2, water, 0.025).scale.x = 1.8
+
+	for i in FIELDS.size():
+		var field := MeshInstance3D.new()
+		var patch := PlaneMesh.new()
+		patch.size = FIELD_SIZE
+		field.mesh = patch
+		field.material_override = _noise_material([FIELD_COLORS[i % 2], FIELD_COLORS[(i + 1) % 2]], NOISE_TILE / 2.0)
+		field.position = axial_to_world(FIELDS[i].x, FIELDS[i].y) + Vector3.UP * 0.02
+		field.rotation_degrees.y = 30.0
+		add_child(field)
 	_place("building_windmill_blue", WINDMILL.x, WINDMILL.y, 120.0)
+
+
+## Two-tone noise material; `tile_size` is the world size of one texture repeat.
+func _noise_material(colors: Array, tile_size: float) -> StandardMaterial3D:
+	var noise := FastNoiseLite.new()
+	noise.frequency = 0.02
+	var ramp := Gradient.new()
+	ramp.set_color(0, colors[0])
+	ramp.set_color(1, colors[1])
+	var texture := NoiseTexture2D.new()
+	texture.noise = noise
+	texture.color_ramp = ramp
+	texture.seamless = true
+	var material := StandardMaterial3D.new()
+	material.albedo_texture = texture
+	material.roughness = 1.0
+	material.uv1_triplanar = true
+	material.uv1_world_triplanar = true
+	material.uv1_scale = Vector3.ONE / tile_size
+	return material
+
+
+## Flat rectangle on the ground from `from` to `to`, with rounded ends.
+func _strip(from: Vector3, to: Vector3, width: float, material: Material, height: float) -> void:
+	var strip := MeshInstance3D.new()
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(width, from.distance_to(to))
+	strip.mesh = plane
+	strip.material_override = material
+	strip.position = (from + to) / 2.0 + Vector3.UP * height
+	var dir := to - from
+	strip.rotation.y = atan2(dir.x, dir.z)
+	add_child(strip)
+	_disc(from, width / 2.0, material, height)
+	_disc(to, width / 2.0, material, height)
+
+
+func _disc(at: Vector3, radius: float, material: Material, height: float) -> MeshInstance3D:
+	var disc := MeshInstance3D.new()
+	var cylinder := CylinderMesh.new()
+	cylinder.top_radius = radius
+	cylinder.bottom_radius = radius
+	cylinder.height = 0.001
+	cylinder.radial_segments = 48
+	cylinder.rings = 1
+	disc.mesh = cylinder
+	disc.material_override = material
+	disc.position = at + Vector3.UP * height
+	add_child(disc)
+	return disc
 
 
 ## Stone wall on WALL_RING: straight pieces along each side, corner pieces
@@ -302,10 +359,8 @@ func _build_nature() -> void:
 				if rng.randf() < OUTSKIRT_SCATTER_CHANCE:
 					var node := _place(OUTSKIRT_SCATTER[rng.randi() % OUTSKIRT_SCATTER.size()], q, r, spin)
 					node.position += Vector3(rng.randf_range(-1.5, 1.5), 0.0, rng.randf_range(-1.5, 1.5))
-			elif ring < GROUND_RINGS:
-				_place(FOREST[rng.randi() % FOREST.size()], q, r, spin)
 			else:
-				_place(HILLS[rng.randi() % HILLS.size()], q, r, spin)
+				_place(FOREST[rng.randi() % FOREST.size()], q, r, spin)
 
 
 func _build_props() -> void:

@@ -15,7 +15,7 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "hex_road_A"
+            "name" : "building_bridge_A"
         }
     ],
     "materials" : [
@@ -32,7 +32,7 @@
     ],
     "meshes" : [
         {
-            "name" : "hex_road_A",
+            "name" : "building_bridge_A",
             "primitives" : [
                 {
                     "attributes" : {
@@ -63,61 +63,61 @@
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 105,
+            "count" : 686,
             "max" : [
-                1,
-                7.450580596923828e-09,
-                1.1547000408172607
+                0.6666667461395264,
+                0.25,
+                0.9622492790222168
             ],
             "min" : [
+                -0.6666644811630249,
                 -1,
-                -1,
-                -1.1547000408172607
+                -0.9622503519058228
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 105,
+            "count" : 686,
             "type" : "VEC2"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 105,
+            "count" : 686,
             "type" : "VEC3"
         },
         {
             "bufferView" : 3,
             "componentType" : 5123,
-            "count" : 174,
+            "count" : 1812,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 1260,
+            "byteLength" : 8232,
             "byteOffset" : 0,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 840,
-            "byteOffset" : 1260,
+            "byteLength" : 5488,
+            "byteOffset" : 8232,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 1260,
-            "byteOffset" : 2100,
+            "byteLength" : 8232,
+            "byteOffset" : 13720,
             "target" : 34962
         },
         {
             "buffer" : 0,
-            "byteLength" : 348,
-            "byteOffset" : 3360,
+            "byteLength" : 3624,
+            "byteOffset" : 21952,
             "target" : 34963
         }
     ],
@@ -129,8 +129,8 @@
     ],
     "buffers" : [
         {
-            "byteLength" : 3708,
-            "uri" : "hex_road_A.bin"
+            "byteLength" : 25576,
+            "uri" : "building_bridge_A.bin"
         }
     ]
 }
