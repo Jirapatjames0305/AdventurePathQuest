@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://cn3q60t01bw0u" path="res://scripts/world/camera_rig.gd" id="2_camrig"]
 [ext_resource type="Script" path="res://scripts/ui/ravenfall_ui.gd" id="3_ui"]
 [ext_resource type="Script" path="res://scripts/characters/character_model.gd" id="4_model"]
+[ext_resource type="Script" path="res://scripts/world/town_square.gd" id="5_square"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.5, 0.6, 0.8, 1)
@@ -72,8 +73,11 @@ surface_material_override/0 = SubResource("FloorMat")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
 shape = SubResource("FloorShape")
 
+[node name="TownSquare" type="Node3D" parent="."]
+script = ExtResource("5_square")
+
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1249246146]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 1, 3.2)
 script = ExtResource("1_player")
 
 [node name="Model" type="Node3D" parent="Player"]
