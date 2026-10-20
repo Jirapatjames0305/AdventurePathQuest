@@ -17,18 +17,21 @@ const FOOTING := 0.4
 const ROOF_HEIGHT := 2.6
 const ROOF_OVERHANG := 0.5
 
+@export var wall_color := WALL
+@export var roof_color := ROOF
+
 var _materials := {}
 
 
 func _ready() -> void:
 	var half := SIZE / 2.0
 	_box(Vector3(SIZE.x + 0.2, FOOTING, SIZE.z + 0.2), _flat(STONE), Vector3(0, FOOTING / 2.0, 0))
-	_box(SIZE, _flat(WALL), Vector3(0, FOOTING + half.y, 0))
+	_box(SIZE, _flat(wall_color), Vector3(0, FOOTING + half.y, 0))
 	_build_beams(half)
 	# Gabled roof: ridge runs left–right, so the gable ends face the sides.
 	var roof := PrismMesh.new()
 	roof.size = Vector3(SIZE.z + ROOF_OVERHANG * 2.0, ROOF_HEIGHT, SIZE.x + ROOF_OVERHANG * 2.0)
-	var roof_node := _mesh(roof, _flat(ROOF), Vector3(0, FOOTING + SIZE.y + ROOF_HEIGHT / 2.0, 0))
+	var roof_node := _mesh(roof, _flat(roof_color), Vector3(0, FOOTING + SIZE.y + ROOF_HEIGHT / 2.0, 0))
 	roof_node.rotation.y = PI / 2.0
 	_box(Vector3(0.8, 2.6, 0.8), _flat(STONE), Vector3(half.x - 1.1, FOOTING + SIZE.y + 1.4, -0.9))
 	# Front: door, two windows, flower box, step.
