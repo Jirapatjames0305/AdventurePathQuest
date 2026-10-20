@@ -16,9 +16,12 @@ const BUILDING_CLEARANCE := 2.0
 const SEED := 7070
 
 var _rng := RandomNumberGenerator.new()
+## Every tree planted: [world position, TreeFactory.Kind] (read by the minimap).
+var trees: Array = []
 
 
 func _ready() -> void:
+	add_to_group("tree_source")
 	_rng.seed = SEED
 	_scatter.call_deferred()
 
@@ -53,7 +56,7 @@ func _scatter() -> void:
 		if crowded:
 			continue
 		placed.append(at)
-		factory.random_tree(self, body, at, _rng)
+		trees.append([at, factory.random_tree(self, body, at, _rng)])
 
 
 ## Ground rectangles (x/z) of every building and wall piece, grown by `clearance`.

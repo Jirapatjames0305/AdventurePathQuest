@@ -21,16 +21,22 @@ const BOTTOM_DARK := 0.2
 var _materials := {}
 
 
+enum Kind { LEAFY, PINE, BLOSSOM }
+
+
 ## A random tree at `at` (parent-local) with a size in [min_size, max_size].
-func random_tree(parent: Node3D, body: StaticBody3D, at: Vector3, rng: RandomNumberGenerator, min_size := 0.8, max_size := 1.35) -> void:
+## Returns which kind was built (callers record it, e.g. for the minimap).
+func random_tree(parent: Node3D, body: StaticBody3D, at: Vector3, rng: RandomNumberGenerator, min_size := 0.8, max_size := 1.35) -> Kind:
 	var size := rng.randf_range(min_size, max_size)
 	var roll := rng.randf()
 	if roll < PINE_CHANCE:
 		pine(parent, body, at, size, rng)
-	elif roll < PINE_CHANCE + BLOSSOM_CHANCE:
+		return Kind.PINE
+	if roll < PINE_CHANCE + BLOSSOM_CHANCE:
 		round_tree(parent, body, at, size * 0.85, rng, BLOSSOMS)
-	else:
-		round_tree(parent, body, at, size, rng, LEAVES)
+		return Kind.BLOSSOM
+	round_tree(parent, body, at, size, rng, LEAVES)
+	return Kind.LEAFY
 
 
 ## Leafy tree: tapered trunk with root flare and two branches, crown of a big

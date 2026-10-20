@@ -37,6 +37,8 @@ const WATER_SHADER := preload("res://shaders/fountain_water.gdshader")
 var _materials := {}
 var _tree_factory := TreeFactory.new()
 var _rng := RandomNumberGenerator.new()
+## Every tree planted: [world position, TreeFactory.Kind] (read by the minimap).
+var trees: Array = []
 var _body: StaticBody3D
 ## All path polylines (loop included), for keeping trees and props off them.
 var _path_lines: Array[PackedVector3Array] = []
@@ -44,6 +46,7 @@ var _path_lines: Array[PackedVector3Array] = []
 
 func _ready() -> void:
 	add_to_group("park")
+	add_to_group("tree_source")
 	_rng.seed = SEED
 	_body = StaticBody3D.new()
 	add_child(_body)
@@ -240,7 +243,7 @@ func _trees() -> void:
 		if crowded:
 			continue
 		placed.append(at)
-		_tree_factory.random_tree(self, _body, at, _rng)
+		trees.append([to_global(at), _tree_factory.random_tree(self, _body, at, _rng)])
 
 
 ## World-space test used by the town tree scatter: is `point` in the park?

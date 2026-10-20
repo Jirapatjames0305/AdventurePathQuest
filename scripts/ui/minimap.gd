@@ -24,6 +24,9 @@ const HOUSE := Color(0.72, 0.56, 0.46)
 const GOLD := Color(0.93, 0.76, 0.36)
 const GOLD_DARK := Color(0.55, 0.4, 0.16)
 const PLAYER := Color(1.0, 0.97, 0.85)
+## Tree dots by TreeFactory.Kind (leafy, pine, blossom) and their radius in metres.
+const TREE_COLORS := [Color(0.27, 0.5, 0.22), Color(0.16, 0.36, 0.2), Color(0.96, 0.66, 0.76)]
+const TREE_RADIUS := 1.6
 
 ## Building node name -> [label, colour]. Unlisted buildings draw as plain houses.
 const SHOPS := {
@@ -49,6 +52,7 @@ var _roads: Array = []  # [PackedVector2Array, width in metres]
 var _squares: Array[PackedVector2Array] = []
 var _fountains: Array[Vector2] = []
 var _ponds: Array[PackedVector2Array] = []
+var _trees: Array = []  # [map position, TreeFactory.Kind]
 ## Each: {"poly": PackedVector2Array, "center": Vector2, "label": String, "color": Color}
 var _buildings: Array[Dictionary] = []
 var _ready_to_draw := false
@@ -125,6 +129,9 @@ func _collect() -> void:
 			var a := TAU * i / 28.0
 			pond.append(_uv(park.to_global(Vector3(cos(a) * Park.POND_RADII.x, 0, sin(a) * Park.POND_RADII.y))))
 		_ponds.append(pond)
+	for source in get_tree().get_nodes_in_group("tree_source"):
+		for tree in source.trees:
+			_trees.append([_uv(tree[0]), tree[1]])
 	for house: Node3D in get_tree().get_nodes_in_group("house"):
 		var box := _local_bounds(house)
 		var poly := PackedVector2Array()
@@ -161,6 +168,10 @@ func _draw_map() -> void:
 		_map.draw_colored_polygon(pond, WATER)
 	for fountain in _fountains:
 		_map.draw_circle(fountain, 3.0, WATER)
+	for tree in _trees:
+		_map.draw_circle(tree[0] + Vector2(0.4, 0.6), TREE_RADIUS, Color(0, 0, 0, 0.22))
+	for tree in _trees:
+		_map.draw_circle(tree[0], TREE_RADIUS * (0.8 if tree[1] == TreeFactory.Kind.PINE else 1.0), TREE_COLORS[tree[1]])
 	for building in _buildings:
 		var shadow: PackedVector2Array = building.poly.duplicate()
 		for i in shadow.size():
