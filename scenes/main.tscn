@@ -85,10 +85,7 @@ script = ExtResource("6_guild")
 
 [node name="GuildPath" type="MeshInstance3D" parent="."]
 script = ExtResource("8_path")
-start = Vector3(-26.53, 0, -18.81)
-start_direction = Vector3(1, 0, 0)
-end = Vector3(-7.83, 0, -5.55)
-straight_length = 8.0
+corners = PackedVector3Array(-26.53, 0, -18.81, -13.0, 0, -18.81, -13.0, 0, -16.0)
 
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1249246146]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 1, 3.2)
