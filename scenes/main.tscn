@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://scripts/debug/map_grid.gd" id="7_grid"]
 [ext_resource type="Script" path="res://scripts/world/stone_path.gd" id="8_path"]
 [ext_resource type="Script" path="res://scripts/world/cottage.gd" id="9_cottage"]
+[ext_resource type="Script" path="res://scripts/world/church.gd" id="10_church"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.5, 0.6, 0.8, 1)
@@ -96,6 +97,10 @@ script = ExtResource("9_cottage")
 script = ExtResource("8_path")
 corners = PackedVector3Array(-18, 0, -27.0, -18, 0, -20.6)
 width = 2.6
+
+[node name="Church" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -36)
+script = ExtResource("10_church")
 
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1249246146]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 1, 3.2)
