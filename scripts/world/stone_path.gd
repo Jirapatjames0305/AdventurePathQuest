@@ -1,67 +1,76 @@
 class_name StonePath
 extends MeshInstance3D
-## A brick path drawn as one continuous ribbon.
-## If `corners` is set, the path is straight segments through those points
-## with sharp (mitered) corners. Otherwise it is a quadratic curve that leaves
-## `start` along `start_direction` and bends to `end`.
+## A brick path through `corners` — straight segments with sharp (mitered)
+## corners. Paving bricks are laid in world space by the shader so they stay
+## square-cut everywhere; kerbstones run along both edges as separate meshes.
 ## Positions are in world space on the ground (y is ignored).
 
 const SHADER := preload("res://shaders/path_bricks.gdshader")
+const KERB_COLOR := Color(0.52, 0.5, 0.47)
 
 @export var corners := PackedVector3Array()
-@export var start := Vector3.ZERO
-@export var start_direction := Vector3.RIGHT
-@export var end := Vector3.ZERO
-## How far the path runs straight out of `start` before bending.
-@export var straight_length := 6.0
 @export var width := 4.0
 @export var height := 0.04
-@export var segments := 32
+@export var kerb_width := 0.35
+@export var kerb_height := 0.1
 
 
 func _ready() -> void:
-	var points := corners
-	if points.is_empty():
-		var control := start + start_direction.normalized() * straight_length
-		for i in segments + 1:
-			var t := float(i) / segments
-			points.append(start.lerp(control, t).lerp(control.lerp(end, t), t))
-	mesh = _ribbon(points)
+	mesh = _ribbon(_offset_line(width / 2.0), _offset_line(-width / 2.0))
 	var material := ShaderMaterial.new()
 	material.shader = SHADER
-	material.set_shader_parameter("width", width)
 	material_override = material
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var kerb := StandardMaterial3D.new()
+	kerb.albedo_color = KERB_COLOR
+	kerb.roughness = 0.9
+	var inset := width / 2.0 - kerb_width / 2.0
+	_build_kerb(_offset_line(inset), kerb)
+	_build_kerb(_offset_line(-inset), kerb)
 
 
-func _ribbon(points: PackedVector3Array) -> ArrayMesh:
+## The centre line shifted sideways by `offset`, with mitered corners.
+func _offset_line(offset: float) -> PackedVector3Array:
+	var line := PackedVector3Array()
+	var last := corners.size() - 1
+	for i in corners.size():
+		var normal_in := _normal(corners[i - 1], corners[i]) if i > 0 else _normal(corners[0], corners[1])
+		var normal_out := _normal(corners[i], corners[i + 1]) if i < last else normal_in
+		var miter := (normal_in + normal_out).normalized()
+		var point := corners[i] + miter * offset / maxf(miter.dot(normal_in), 0.3)
+		line.append(Vector3(point.x, height, point.z))
+	return line
+
+
+func _ribbon(left: PackedVector3Array, right: PackedVector3Array) -> ArrayMesh:
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var distance := 0.0
-	for i in points.size():
-		# Mitered side offset: average the normals of the segments either side.
-		var normal_in := _normal(points[maxi(i - 1, 0)], points[i]) if i > 0 else _normal(points[i], points[i + 1])
-		var normal_out := _normal(points[i], points[i + 1]) if i < points.size() - 1 else normal_in
-		var miter := (normal_in + normal_out).normalized()
-		var side := miter * (width / 2.0) / maxf(miter.dot(normal_in), 0.3)
-		if i > 0:
-			distance += points[i].distance_to(points[i - 1])
-		var center := Vector3(points[i].x, height, points[i].z)
+	for i in left.size():
 		tool.set_normal(Vector3.UP)
-		tool.set_uv(Vector2(0.0, distance))
-		tool.add_vertex(center + side)
+		tool.add_vertex(left[i])
 		tool.set_normal(Vector3.UP)
-		tool.set_uv(Vector2(1.0, distance))
-		tool.add_vertex(center - side)
-	for i in points.size() - 1:
+		tool.add_vertex(right[i])
+	for i in left.size() - 1:
 		var a := i * 2
-		tool.add_index(a)
-		tool.add_index(a + 2)
-		tool.add_index(a + 1)
-		tool.add_index(a + 1)
-		tool.add_index(a + 2)
-		tool.add_index(a + 3)
+		for index in [a, a + 2, a + 1, a + 1, a + 2, a + 3]:
+			tool.add_index(index)
 	return tool.commit()
+
+
+## One box per segment, lengthened by a kerb width so corners close up.
+func _build_kerb(line: PackedVector3Array, material: Material) -> void:
+	for i in line.size() - 1:
+		var from := line[i]
+		var to := line[i + 1]
+		var box := BoxMesh.new()
+		box.size = Vector3(kerb_width, kerb_height, from.distance_to(to) + kerb_width)
+		var stone := MeshInstance3D.new()
+		stone.mesh = box
+		stone.material_override = material
+		stone.position = (from + to) / 2.0 + Vector3.UP * (kerb_height / 2.0 - height)
+		var dir := to - from
+		stone.rotation.y = atan2(dir.x, dir.z)
+		add_child(stone)
 
 
 func _normal(from: Vector3, to: Vector3) -> Vector3:
